@@ -2,477 +2,278 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#0b0e1c" />
-  <meta name="background-color" content="#070913" />
-  <meta name="description" content="PRISM CLASH — Cosmic tactical 108-card shedding game configured for GitHub Pages PWA installation." />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#111625" />
+  <meta name="background-color" content="#0b0f19" />
+  <meta name="description" content="KING BATTLE — Royal 108-card battle game with AI opponents, custom rules, and local pass-and-play." />
+  <meta name="application-name" content="King Battle" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Prism Clash" />
+  <meta name="apple-mobile-web-app-title" content="King Battle" />
+  <meta property="og:title" content="KING BATTLE — Royal Card Arena" />
+  <meta property="og:description" content="A modern royal 108-card battle game with AI opponents and custom rules." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="./icons/screenshot-wide.png" />
+
+  <link rel="icon" type="image/svg+xml" href="./icons/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png" />
+  <link id="pwa-apple-icon" rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png" />
   <link rel="manifest" href="./manifest.json" />
-  <link id="pwa-apple-icon" rel="apple-touch-icon" href="./icons/icon-192.png" />
-  <title>PRISM CLASH — Cosmic Card Arena</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg-theme: radial-gradient(circle at 50% 20%, #1e1b4b 0%, #0f172a 55%, #020617 100%);
-      --card-crimson: linear-gradient(145deg, #ff3b5c 0%, #be123c 100%);
-      --card-gold: linear-gradient(145deg, #fbbf24 0%, #d97706 100%);
-      --card-emerald: linear-gradient(145deg, #10b981 0%, #047857 100%);
-      --card-cobalt: linear-gradient(145deg, #3b82f6 0%, #1d4ed8 100%);
-      --card-prism: conic-gradient(from 45deg, #ff3b5c, #fbbf24, #10b981, #3b82f6, #a855f7, #ff3b5c);
-    }
 
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-    }
+  <title>KING BATTLE — Royal Card Arena</title>
 
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      font-family: 'Outfit', sans-serif;
-      background: #020617;
-      color: #f8fafc;
-      touch-action: manipulation;
-    }
-
-    .game-bg {
-      background: var(--bg-theme);
-      transition: background 0.5s ease;
-    }
-
-    .bg-nebula { --bg-theme: radial-gradient(circle at 50% 25%, #2e1065 0%, #0f172a 60%, #020617 100%); }
-    .bg-cyber { --bg-theme: radial-gradient(circle at 50% 25%, #064e3b 0%, #090d16 60%, #020617 100%); }
-    .bg-solar { --bg-theme: radial-gradient(circle at 50% 25%, #7c2d12 0%, #18181b 60%, #09090b 100%); }
-    .bg-abyss { --bg-theme: radial-gradient(circle at 50% 25%, #1e3a8a 0%, #090d16 60%, #020617 100%); }
-
-    /* Card Styling */
-    .prism-card {
-      position: relative;
-      border-radius: 14px;
-      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.45);
-      border: 3px solid rgba(255, 255, 255, 0.92);
-      transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.22s ease, filter 0.2s ease;
-      flex-shrink: 0;
-      overflow: hidden;
-    }
-
-    .no-anim .prism-card,
-    .no-anim * {
-      transition: none !important;
-      animation: none !important;
-    }
-
-    .card-red { background: var(--card-crimson); }
-    .card-yellow { background: var(--card-gold); }
-    .card-green { background: var(--card-emerald); }
-    .card-blue { background: var(--card-cobalt); }
-    .card-wild {
-      background: #0f172a;
-      border-color: #f8fafc;
-    }
-
-    .card-wild::before {
-      content: '';
-      position: absolute;
-      inset: -12px;
-      background: var(--card-prism);
-      opacity: 0.92;
-      z-index: 0;
-    }
-
-    .card-inner-oval {
-      position: absolute;
-      inset: 12% 10%;
-      background: rgba(15, 23, 42, 0.22);
-      border-radius: 999px;
-      transform: rotate(-22deg);
-      border: 2px solid rgba(255, 255, 255, 0.35);
-      z-index: 1;
-    }
-
-    .card-wild .card-inner-oval {
-      background: rgba(2, 6, 23, 0.78);
-      border-color: rgba(255, 255, 255, 0.7);
-    }
-
-    /* Card Backs */
-    .card-back {
-      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
-      border: 2.5px solid #cbd5e1;
-      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.55);
-    }
-    .card-back-prism { background: linear-gradient(135deg, #1e1b4b, #4c1d95, #0f172a); border-color: #a855f7; }
-    .card-back-solar { background: linear-gradient(135deg, #451a03, #9a3412, #1c1917); border-color: #f59e0b; }
-    .card-back-matrix { background: linear-gradient(135deg, #022c22, #065f46, #090d16); border-color: #10b981; }
-
-    /* Interactive Hand Cards */
-    .hand-card {
-      width: 78px;
-      height: 116px;
-      cursor: pointer;
-    }
-    @media (min-width: 640px) {
-      .hand-card {
-        width: 96px;
-        height: 142px;
-      }
-    }
-    @media (min-width: 1024px) {
-      .hand-card {
-        width: 106px;
-        height: 156px;
-      }
-    }
-
-    .hand-card.playable {
-      box-shadow: 0 0 18px rgba(255, 255, 255, 0.65), 0 10px 22px rgba(0, 0, 0, 0.6);
-      transform: translateY(-10px);
-    }
-    .hand-card.playable:hover {
-      transform: translateY(-22px) scale(1.06);
-      z-index: 40 !important;
-      box-shadow: 0 0 26px rgba(250, 204, 21, 0.9), 0 16px 28px rgba(0, 0, 0, 0.7);
-    }
-    .hand-card.unplayable {
-      filter: brightness(0.65) saturate(0.8);
-    }
-    .hand-card.unplayable:hover {
-      transform: translateY(-4px);
-    }
-
-    @keyframes shakeCard {
-      0%, 100% { transform: translateX(0); }
-      20% { transform: translateX(-8px) rotate(-4deg); }
-      40% { transform: translateX(8px) rotate(4deg); }
-      60% { transform: translateX(-6px) rotate(-2deg); }
-      80% { transform: translateX(6px) rotate(2deg); }
-    }
-    .shake-invalid {
-      animation: shakeCard 0.35s ease-in-out !important;
-      box-shadow: 0 0 22px #ef4444 !important;
-    }
-
-    @keyframes popBanner {
-      0% { transform: translate(-50%, -50%) scale(0.4); opacity: 0; }
-      20% { transform: translate(-50%, -50%) scale(1.12); opacity: 1; }
-      80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-      100% { transform: translate(-50%, -65%) scale(0.95); opacity: 0; }
-    }
-    .action-banner {
-      animation: popBanner 1.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    }
-
-    @keyframes pulseGlow {
-      0%, 100% { transform: scale(1); box-shadow: 0 0 15px rgba(244, 63, 94, 0.7), 0 0 30px rgba(250, 204, 21, 0.5); }
-      50% { transform: scale(1.07); box-shadow: 0 0 25px rgba(244, 63, 94, 0.95), 0 0 45px rgba(250, 204, 21, 0.85); }
-    }
-    .prism-btn-pulse {
-      animation: pulseGlow 1.1s infinite ease-in-out;
-    }
-
-    @keyframes spinSlow {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-    @keyframes spinSlowRev {
-      from { transform: rotate(360deg); }
-      to { transform: rotate(0deg); }
-    }
-    .dir-cw { animation: spinSlow 9s linear infinite; }
-    .dir-ccw { animation: spinSlowRev 9s linear infinite; }
-
-    .hand-scroll::-webkit-scrollbar {
-      height: 6px;
-    }
-    .hand-scroll::-webkit-scrollbar-track {
-      background: rgba(15, 23, 42, 0.4);
-      border-radius: 999px;
-    }
-    .hand-scroll::-webkit-scrollbar-thumb {
-      background: rgba(148, 163, 184, 0.45);
-      border-radius: 999px;
-    }
-
-    .glass-panel {
-      background: rgba(15, 23, 42, 0.82);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: 1px solid rgba(255, 255, 255, 0.14);
-    }
-
-    .text-stroke {
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.85), 0 0 2px rgba(0, 0, 0, 0.9);
-    }
-
-    #confetti-canvas {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 90;
-    }
-  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
 </head>
-<body class="game-bg bg-nebula select-none">
+<body class="game-bg bg-nebula">
 
-  <canvas id="confetti-canvas"></canvas>
+  <canvas id="confetti-canvas" aria-hidden="true"></canvas>
 
   <!-- ==================== MAIN MENU SCREEN ==================== -->
-  <div id="screen-menu" class="fixed inset-0 z-20 flex flex-col items-center justify-between p-4 sm:p-6 overflow-y-auto">
-    <!-- Top Utility Bar -->
-    <div class="w-full max-w-5xl flex items-center justify-between">
-      <button onclick="openModal('modal-profile')" class="glass-panel flex items-center gap-2.5 px-3.5 py-2 rounded-2xl hover:bg-slate-800/90 transition active:scale-95">
-        <span id="menu-player-avatar" class="text-2xl">🚀</span>
-        <div class="text-left">
-          <div id="menu-player-name" class="text-sm font-bold text-white leading-tight">Nova</div>
-          <div class="text-[11px] text-indigo-300 font-medium">Edit Profile</div>
+  <div id="screen-menu" class="menu-screen">
+    <header class="menu-topbar">
+      <button type="button" onclick="openModal('modal-profile')" class="m3-surface profile-chip" aria-label="Edit player profile and theme">
+        <span id="menu-player-avatar" class="human-avatar human-avatar-lg" aria-hidden="true">👑</span>
+        <div>
+          <div id="menu-player-name" style="font-size: 0.9rem; font-weight: 800; line-height: 1.15;">King</div>
+          <div style="font-size: 0.72rem; color: var(--md-sys-color-primary); font-weight: 600;">Profile &amp; Theme</div>
         </div>
       </button>
 
-      <div class="flex items-center gap-2">
-        <button id="btn-install-app" onclick="triggerPwaInstall()" class="hidden glass-panel px-3.5 py-2 rounded-2xl border border-emerald-400/50 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-200 transition active:scale-95 text-xs sm:text-sm font-extrabold flex items-center gap-1.5 shadow-lg">
-          <span>📲</span> <span>Install App</span>
-        </button>
-        <button id="btn-quick-mute" onclick="toggleMute()" title="Toggle Mute" class="glass-panel p-2.5 rounded-2xl hover:bg-slate-800/90 transition active:scale-95 text-lg">
+      <div class="topbar-actions">
+        <span id="network-status-pill" class="network-pill hidden" role="status" aria-live="polite">⚡ Offline Ready</span>
+
+        <button id="btn-quick-mute" type="button" onclick="toggleMute()" title="Toggle Mute" aria-label="Toggle Audio Mute" aria-pressed="false" class="m3-icon-btn">
           🔊
         </button>
-        <button onclick="openModal('modal-settings')" class="glass-panel px-3.5 py-2.5 rounded-2xl hover:bg-slate-800/90 transition active:scale-95 text-sm font-bold flex items-center gap-1.5">
-          <span>⚙️</span> <span class="hidden sm:inline">Settings</span>
+
+        <button type="button" onclick="openModal('modal-settings')" aria-label="Open Settings" class="m3-btn m3-btn-tonal" style="padding-inline: 1rem;">
+          <span aria-hidden="true">⚙️</span>
+          <span class="desktop-only">Settings</span>
         </button>
       </div>
-    </div>
+    </header>
 
-    <!-- Center Logo & Actions -->
-    <div class="flex flex-col items-center my-auto py-4 w-full max-w-md text-center">
-      <div class="mb-3 relative">
-        <svg class="w-24 h-24 sm:w-28 sm:h-28 drop-shadow-[0_0_25px_rgba(168,85,247,0.65)]" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="prismGrad1" x1="10" y1="10" x2="110" y2="110" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stop-color="#FF3B5C"/>
-              <stop offset="33%" stop-color="#FBBF24"/>
-              <stop offset="66%" stop-color="#10B981"/>
-              <stop offset="100%" stop-color="#3B82F6"/>
-            </linearGradient>
-            <linearGradient id="prismInner" x1="60" y1="15" x2="60" y2="105" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.95"/>
-              <stop offset="100%" stop-color="#C084FC" stop-opacity="0.35"/>
-            </linearGradient>
-          </defs>
-          <polygon points="60,8 110,38 110,82 60,112 10,82 10,38" fill="#0F172A" stroke="url(#prismGrad1)" stroke-width="6"/>
-          <polygon points="60,20 96,60 60,100 24,60" fill="url(#prismGrad1)" opacity="0.88"/>
-          <polygon points="60,20 96,60 60,60" fill="url(#prismInner)" opacity="0.75"/>
-          <circle cx="60" cy="60" r="14" fill="#0F172A" stroke="#FFFFFF" stroke-width="3"/>
-          <path d="M60 50 L63 57 L70 60 L63 63 L60 70 L57 63 L50 60 L57 57 Z" fill="#FBBF24"/>
-        </svg>
-      </div>
-
-      <h1 class="text-4xl sm:text-6xl font-black tracking-tight bg-gradient-to-r from-rose-400 via-amber-300 via-emerald-300 to-sky-400 bg-clip-text text-transparent drop-shadow">
-        PRISM CLASH
-      </h1>
-      <p class="text-slate-300 text-xs sm:text-sm tracking-widest uppercase font-semibold mt-1 mb-6">
-        Cosmic Tactical Card Arena
-      </p>
-
-      <div class="w-full space-y-3">
-        <button onclick="startQuickPlay()" class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-rose-500 via-amber-500 to-emerald-500 hover:brightness-110 text-slate-950 font-black text-lg sm:text-xl shadow-[0_8px_25px_rgba(244,63,94,0.45)] transition transform active:scale-95 flex items-center justify-center gap-2">
-          <span>⚡</span> QUICK PLAY (CLASSIC 4P)
-        </button>
-
-        <button onclick="openModal('modal-modes')" class="w-full py-3.5 px-6 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-base sm:text-lg shadow-lg transition transform active:scale-95 flex items-center justify-center gap-2">
-          <span>🎮</span> SELECT GAME MODE
-        </button>
-
-        <button onclick="openCustomMatch()" class="w-full py-3.5 px-6 rounded-2xl glass-panel hover:bg-slate-800/90 text-white font-bold text-base transition transform active:scale-95 flex items-center justify-center gap-2">
-          <span>🛠️</span> CUSTOM MATCH & HOUSE RULES
-        </button>
-
-        <!-- PWA Status & Studio Banner -->
-        <div id="pwa-menu-banner" class="glass-panel w-full rounded-2xl p-3 border border-indigo-400/25 flex items-center justify-between gap-3 text-left">
-          <div class="flex items-center gap-2.5 min-w-0">
-            <span id="pwa-status-icon" class="text-xl shrink-0">🌐</span>
-            <div class="min-w-0">
-              <div id="pwa-status-title" class="text-xs font-extrabold text-white truncate">GitHub Pages PWA Ready</div>
-              <div id="pwa-status-sub" class="text-[11px] text-slate-300 truncate">Checking Service Worker & Install...</div>
-            </div>
-          </div>
-          <button id="btn-banner-install" onclick="openPwaInfoModal()" class="shrink-0 px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs transition active:scale-95">
-            PWA Studio
-          </button>
+    <main class="menu-main">
+      <!-- Brand Showcase Column -->
+      <section class="menu-brand-col" aria-labelledby="app-hero-title">
+        <div class="brand-logo-wrap" aria-hidden="true">
+          <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="prismGrad1" x1="10" y1="10" x2="110" y2="110" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#FF4766"/>
+                <stop offset="33%" stop-color="#FCD34D"/>
+                <stop offset="66%" stop-color="#34D399"/>
+                <stop offset="100%" stop-color="#60A5FA"/>
+              </linearGradient>
+              <linearGradient id="prismInner" x1="60" y1="15" x2="60" y2="105" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.95"/>
+                <stop offset="100%" stop-color="#A8C7FA" stop-opacity="0.32"/>
+              </linearGradient>
+            </defs>
+            <ellipse cx="60" cy="105" rx="42" ry="8" fill="#0B0F19" opacity=".8"/>
+            <path d="M20 78 L31 42 L48 58 L60 28 L72 58 L89 42 L100 78 Z" fill="url(#prismGrad1)" stroke="#FFFFFF" stroke-width="3" stroke-linejoin="round"/>
+            <path d="M24 78 H96 L91 94 H29 Z" fill="#111625" stroke="#FCD34D" stroke-width="4" stroke-linejoin="round"/>
+            <circle cx="31" cy="41" r="5" fill="#FF4766"/>
+            <circle cx="60" cy="27" r="5" fill="#FCD34D"/>
+            <circle cx="89" cy="41" r="5" fill="#60A5FA"/>
+          </svg>
         </div>
-      </div>
 
-      <div class="grid grid-cols-3 gap-2.5 w-full mt-4">
-        <button onclick="openModal('modal-rules')" class="glass-panel py-3 px-2 rounded-2xl hover:bg-slate-800/90 transition active:scale-95 flex flex-col items-center gap-1">
-          <span class="text-xl">📖</span>
-          <span class="text-xs font-bold">How to Play</span>
-        </button>
-        <button onclick="openStatsModal()" class="glass-panel py-3 px-2 rounded-2xl hover:bg-slate-800/90 transition active:scale-95 flex flex-col items-center gap-1">
-          <span class="text-xl">🏆</span>
-          <span class="text-xs font-bold">Stats & Medals</span>
-        </button>
-        <button onclick="openModal('modal-about')" class="glass-panel py-3 px-2 rounded-2xl hover:bg-slate-800/90 transition active:scale-95 flex flex-col items-center gap-1">
-          <span class="text-xl">✨</span>
-          <span class="text-xs font-bold">Deck & Info</span>
-        </button>
-      </div>
-    </div>
+        <h1 id="app-hero-title" class="brand-title">KING BATTLE</h1>
+        <p class="brand-subtitle">Royal Tactical Card Arena</p>
 
-    <div class="text-[11px] text-slate-400 font-medium">
-      108-Card Rules • Colour-Blind Accessible • GitHub Pages PWA Ready
-    </div>
+        <div class="brand-badges" aria-label="Game highlights">
+          <span class="m3-badge-chip">🃏 Official 108-Card Deck</span>
+          <span class="m3-badge-chip">🎨 Colour-Blind Accessible</span>
+          <span class="m3-badge-chip">⚔️ Skill &amp; Strategy</span>
+        </div>
+      </section>
+
+      <!-- Material 3 Action Card Column -->
+      <section class="m3-surface-elevated menu-actions-card" aria-label="Play options">
+        <button type="button" onclick="startQuickPlay()" class="m3-btn m3-btn-hero" style="width: 100%;">
+          <span aria-hidden="true">⚡</span>
+          <span>Quick Play (Classic 4P)</span>
+        </button>
+
+        <button type="button" onclick="openModal('modal-modes')" class="m3-btn m3-btn-primary" style="width: 100%; border-radius: var(--md-radius-lg);">
+          <span aria-hidden="true">🎮</span>
+          <span>Select Game Mode</span>
+        </button>
+
+        <button type="button" onclick="openCustomMatch()" class="m3-btn m3-btn-tonal" style="width: 100%; border-radius: var(--md-radius-lg);">
+          <span aria-hidden="true">🛠️</span>
+          <span>Custom Match &amp; House Rules</span>
+        </button>
+
+        <nav class="quick-nav-grid" aria-label="Secondary menu">
+          <button type="button" onclick="openModal('modal-rules')" class="quick-nav-tile">
+            <span style="font-size: 1.3rem;" aria-hidden="true">📖</span>
+            <span>How to Play</span>
+          </button>
+          <button type="button" onclick="openStatsModal()" class="quick-nav-tile">
+            <span style="font-size: 1.3rem;" aria-hidden="true">🏆</span>
+            <span>Stats &amp; Medals</span>
+          </button>
+          <button type="button" onclick="openModal('modal-about')" class="quick-nav-tile">
+            <span style="font-size: 1.3rem;" aria-hidden="true">✨</span>
+            <span>Deck &amp; Info</span>
+          </button>
+        </nav>
+      </section>
+    </main>
+
+    <footer class="menu-footer">
+      <span>2–6 Players • AI &amp; Local Pass-and-Play</span>
+      <span class="lg-only">Shortcuts: <strong>1–9</strong> Play Card • <strong>D</strong> Draw • <strong>K</strong> King • <strong>Esc</strong> Pause</span>
+    </footer>
   </div>
 
   <!-- ==================== GAMEPLAY SCREEN ==================== -->
-  <div id="screen-game" class="fixed inset-0 z-10 hidden flex-col justify-between p-2 sm:p-4">
+  <main id="screen-game" class="game-screen hidden" aria-label="Gameplay Arena">
     <!-- Top HUD & Opponents -->
-    <div class="w-full max-w-6xl mx-auto flex flex-col gap-2">
-      <div class="flex items-center justify-between gap-2">
-        <div class="flex items-center gap-2">
-          <button onclick="pauseGame()" class="glass-panel px-3 py-2 rounded-xl hover:bg-slate-800 font-bold text-xs sm:text-sm flex items-center gap-1.5 active:scale-95">
-            <span>⏸️</span> <span class="hidden sm:inline">Pause</span>
+    <header class="game-top-zone">
+      <div class="game-hud-bar">
+        <div class="game-hud-left">
+          <button type="button" onclick="pauseGame()" aria-label="Pause Game" class="m3-btn m3-btn-tonal" style="padding-inline: 0.85rem; min-height: 44px; font-size: 0.82rem;">
+            <span aria-hidden="true">⏸️</span>
+            <span class="desktop-only">Pause</span>
           </button>
-          <div class="glass-panel px-3 py-1.5 rounded-xl text-xs font-bold text-indigo-200 flex items-center gap-2">
+
+          <div class="m3-surface match-status-pill">
             <span id="hud-mode-badge">Classic</span>
-            <span class="text-slate-500">|</span>
+            <span style="opacity: 0.45;" aria-hidden="true">•</span>
             <span id="hud-round-badge">Round 1</span>
-            <span id="hud-target-badge" class="hidden sm:inline text-amber-300"></span>
+            <span id="hud-target-badge" class="desktop-only" style="color: var(--md-sys-color-tertiary);"></span>
           </div>
         </div>
 
-        <div id="hud-house-rules" class="hidden md:flex items-center gap-1.5 flex-wrap justify-center"></div>
+        <div id="hud-house-rules" class="house-rules-strip" aria-label="Active house rules"></div>
 
-        <div class="flex items-center gap-1.5">
-          <button onclick="openModal('modal-rules')" class="glass-panel p-2 rounded-xl hover:bg-slate-800 text-xs font-bold active:scale-95" title="Rules">📖</button>
-          <button id="btn-game-mute" onclick="toggleMute()" class="glass-panel p-2 rounded-xl hover:bg-slate-800 text-xs font-bold active:scale-95" title="Mute">🔊</button>
+        <div class="game-hud-right">
+          <button type="button" onclick="openModal('modal-rules')" class="m3-icon-btn" title="Rules &amp; Card Guide" aria-label="Open Rules and Card Guide">📖</button>
+          <button id="btn-game-mute" type="button" onclick="toggleMute()" class="m3-icon-btn" title="Toggle Mute" aria-label="Toggle Audio Mute" aria-pressed="false">🔊</button>
         </div>
       </div>
 
-      <div id="opponents-container" class="flex items-center justify-center gap-2 sm:gap-4 flex-wrap py-1"></div>
-    </div>
+      <div id="opponents-container" class="opponents-strip" role="region" aria-label="Opponents"></div>
+    </header>
 
-    <!-- Center Arena -->
-    <div class="relative flex-1 flex flex-col items-center justify-center my-1">
-      <div id="turn-indicator" class="mb-2 sm:mb-3 px-4 py-1.5 rounded-full glass-panel text-xs sm:text-sm font-extrabold tracking-wide text-center shadow-lg transition-all">
+    <!-- Center Play Table -->
+    <section class="arena-center" aria-label="Card Table">
+      <div id="turn-indicator" class="turn-pill turn-pill-human" role="status" aria-live="polite">
         Your Turn!
       </div>
 
-      <div class="relative flex items-center justify-center gap-6 sm:gap-12 p-4 sm:p-6">
-        <div id="direction-ring" class="dir-cw pointer-events-none absolute w-56 h-56 sm:w-72 sm:h-72 rounded-full border-2 border-dashed border-white/20 flex items-center justify-between px-1">
-          <span class="text-white/40 text-lg font-black">↻</span>
-          <span class="text-white/40 text-lg font-black">↻</span>
+      <div class="table-triad">
+        <div id="direction-ring" class="orbit-ring dir-cw" aria-hidden="true">
+          <span>↻</span>
+          <span>↻</span>
         </div>
 
         <!-- Draw Pile -->
-        <div class="flex flex-col items-center gap-1.5 z-10">
-          <button id="btn-draw-pile" onclick="humanDrawCard()" class="relative group focus:outline-none active:scale-95 transition transform">
-            <div id="draw-pile-visual" class="w-20 h-28 sm:w-24 sm:h-36 rounded-2xl card-back flex flex-col items-center justify-center relative">
-              <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 border border-white/30 flex items-center justify-center">
-                <span class="text-lg sm:text-xl">✦</span>
+        <div class="pile-column">
+          <button id="btn-draw-pile" type="button" onclick="humanDrawCard()" class="pile-btn" aria-label="Draw card from deck">
+            <div id="draw-pile-visual" class="pile-slot prism-card card-back" style="align-items: center; justify-content: center; gap: 0.35rem;">
+              <div style="width: 42%; aspect-ratio: 1; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1.5px solid rgba(255,255,255,0.32); display: flex; align-items: center; justify-content: center;">
+                <span style="font-size: clamp(0.95rem, 2.5vw, 1.25rem);" aria-hidden="true">✦</span>
               </div>
-              <span id="draw-pile-count" class="mt-1.5 text-[11px] font-black tracking-wider text-slate-200 bg-black/50 px-2 py-0.5 rounded-full">108</span>
+              <span id="draw-pile-count" style="font-size: 0.7rem; font-weight: 900; background: rgba(0,0,0,0.55); padding: 2px 8px; border-radius: 999px; color: #f8fafc;">108</span>
             </div>
-            <div id="draw-pile-glow" class="hidden absolute -inset-1.5 rounded-2xl border-2 border-amber-400 animate-pulse pointer-events-none"></div>
+            <div id="draw-pile-glow" class="draw-glow-ring hidden" aria-hidden="true"></div>
           </button>
-          <span class="text-[11px] font-bold text-slate-300 uppercase tracking-wider">Draw</span>
+          <span class="pile-caption">Draw</span>
         </div>
 
-        <!-- Active Colour Indicator -->
-        <div class="flex flex-col items-center gap-2 z-10">
-          <div id="active-color-orb" class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl border-2 border-white shadow-lg flex flex-col items-center justify-center transition-all duration-300">
-            <span id="active-color-icon" class="text-lg sm:text-xl leading-none">🔥</span>
-            <span id="active-color-label" class="text-[9px] font-black uppercase tracking-wider mt-0.5">RED</span>
+        <!-- Active Suit Indicator -->
+        <div class="suit-hub">
+          <div id="active-color-orb" class="color-orb orb-red" role="status" aria-label="Active suit">
+            <span id="active-color-icon" style="font-size: clamp(1rem, 2.8vmin, 1.3rem); line-height: 1;" aria-hidden="true">🔥</span>
+            <span id="active-color-label" style="font-size: 0.56rem; font-weight: 900; letter-spacing: 0.05em; margin-top: 2px;">CRIMSON</span>
           </div>
-          <div id="pending-stack-badge" class="hidden px-2.5 py-0.5 rounded-full bg-rose-600 text-white text-xs font-black animate-bounce shadow">
-            +2 STACK
-          </div>
-          <div id="direction-label" class="text-[10px] font-bold text-slate-300 uppercase tracking-wider">
-            Clockwise ↻
-          </div>
+          <div id="pending-stack-badge" class="stack-alert-chip hidden" role="status">+2 STACK</div>
+          <div id="direction-label" class="direction-caption">Clockwise ↻</div>
         </div>
 
         <!-- Discard Pile -->
-        <div class="flex flex-col items-center gap-1.5 z-10">
-          <div id="discard-pile-slot" class="w-20 h-28 sm:w-24 sm:h-36 flex items-center justify-center"></div>
-          <span class="text-[11px] font-bold text-slate-300 uppercase tracking-wider">Discard</span>
+        <div class="pile-column">
+          <div id="discard-pile-slot" class="pile-slot" aria-label="Top discard card"></div>
+          <span class="pile-caption">Discard</span>
         </div>
       </div>
 
       <!-- Post-Draw Bar -->
-      <div id="post-draw-bar" class="hidden mt-2 glass-panel px-4 py-2 rounded-2xl flex items-center gap-3 z-20 shadow-xl border border-amber-400/50">
-        <span class="text-xs sm:text-sm font-bold text-amber-200">Playable card drawn!</span>
-        <button onclick="playDrawnCard()" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs sm:text-sm active:scale-95">
+      <div id="post-draw-bar" class="m3-surface-elevated post-draw-toolbar hidden" role="region" aria-label="Drawn card actions">
+        <span style="font-size: 0.82rem; font-weight: 800; color: var(--md-sys-color-tertiary); padding-inline: 0.35rem;">Playable card drawn!</span>
+        <button type="button" onclick="playDrawnCard()" class="m3-btn m3-btn-success" style="min-height: 40px; padding: 0.4rem 0.95rem; font-size: 0.82rem;">
           Play Now
         </button>
-        <button onclick="passAfterDraw()" class="px-3.5 py-1.5 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs sm:text-sm active:scale-95">
-          Keep & Pass
+        <button type="button" onclick="passAfterDraw()" class="m3-btn m3-btn-tonal" style="min-height: 40px; padding: 0.4rem 0.95rem; font-size: 0.82rem;">
+          Keep &amp; Pass
         </button>
       </div>
-    </div>
+    </section>
 
-    <div id="floating-banner-container" class="pointer-events-none fixed inset-0 z-40"></div>
+    <div id="floating-banner-container" aria-live="polite" aria-atomic="true"></div>
 
-    <!-- Bottom Hand Area -->
-    <div class="w-full max-w-6xl mx-auto flex flex-col gap-2">
-      <div class="flex items-center justify-between px-1 gap-2">
-        <div class="flex items-center gap-2">
-          <span id="human-avatar-hud" class="text-xl">🚀</span>
-          <div>
-            <div class="flex items-center gap-2">
-              <span id="human-name-hud" class="text-xs sm:text-sm font-extrabold text-white">Nova</span>
-              <span id="human-score-hud" class="text-xs font-bold text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded-full">0 pts</span>
+    <!-- Bottom Player Hand Area -->
+    <section class="player-dock" aria-label="Your Hand and Actions">
+      <div class="player-hud-row">
+        <div class="player-identity">
+          <span id="human-avatar-hud" class="human-avatar" aria-hidden="true">👑</span>
+          <div style="min-width: 0;">
+            <div style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
+              <span id="human-name-hud" style="font-size: 0.88rem; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">King</span>
+              <span id="human-score-hud" class="score-pill">0 pts</span>
             </div>
-            <div id="human-card-count-hud" class="text-[11px] text-slate-300">7 cards</div>
+            <div id="human-card-count-hud" style="font-size: 0.72rem; color: var(--md-sys-color-on-surface-variant); font-weight: 600;">7 cards</div>
           </div>
         </div>
 
-        <div class="flex items-center gap-2">
-          <button id="btn-catch-uno" onclick="catchUnoCall()" class="hidden px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs sm:text-sm shadow-lg animate-bounce active:scale-95">
-            🚨 CATCH! (+2)
+        <div class="player-action-btns">
+          <button id="btn-catch-uno" type="button" onclick="catchUnoCall()" class="btn-catch-alert hidden">
+            🚨 Catch! (+2)
           </button>
 
-          <button id="btn-declare-prism" onclick="declarePrism()" class="px-4 py-2 sm:px-5 sm:py-2.5 rounded-2xl bg-gradient-to-r from-rose-500 via-amber-400 to-sky-500 text-slate-950 font-black text-xs sm:text-base shadow-lg transition transform active:scale-95 opacity-60">
-            ✦ PRISM! (1 LEFT)
+          <button id="btn-declare-prism" type="button" onclick="declarePrism()" class="btn-prism-call btn-prism-idle">
+            👑 KING! <span class="desktop-only">(1 Left)</span>
           </button>
         </div>
       </div>
 
-      <div id="human-hand-scroll" class="hand-scroll w-full overflow-x-auto pb-2 pt-5 px-4 flex items-center justify-start sm:justify-center min-h-[145px] sm:min-h-[175px]">
-        <div id="human-hand-cards" class="flex items-center transition-all duration-200"></div>
+      <div id="human-hand-scroll" class="hand-scroll" role="region" aria-label="Your cards">
+        <div id="human-hand-cards" class="hand-cards-track"></div>
       </div>
-    </div>
-  </div>
+    </section>
+  </main>
 
-  <!-- ==================== MODALS ==================== -->
+  <!-- ==================== MODALS (Material Design 3 Dialogs) ==================== -->
 
   <!-- Wild Color Picker -->
-  <div id="modal-color-picker" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-4">
-    <div class="glass-panel max-w-sm w-full rounded-3xl p-6 text-center shadow-2xl border border-white/20">
-      <h3 class="text-xl font-black text-white mb-1">Choose Next Prism Colour</h3>
-      <p class="text-xs text-slate-300 mb-5">Select active colour for next player</p>
-      <div class="grid grid-cols-2 gap-3.5">
-        <button onclick="selectWildColor('red')" class="py-5 rounded-2xl card-red text-white font-black text-lg shadow-lg hover:scale-105 transition active:scale-95 flex flex-col items-center gap-1 border-2 border-white">
-          <span class="text-2xl">🔥</span>
+  <div id="modal-color-picker" class="m3-modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="title-color-picker">
+    <div class="m3-dialog m3-dialog-sm" style="text-align: center;">
+      <h2 id="title-color-picker" class="m3-dialog-title" style="margin-bottom: 0.25rem;">Choose Next Royal Colour</h2>
+      <p style="margin: 0 0 1.25rem; font-size: 0.82rem; color: var(--md-sys-color-on-surface-variant);">Select the active suit for the next player</p>
+      <div class="wild-picker-grid">
+        <button type="button" onclick="selectWildColor('red')" class="wild-color-btn card-red text-white-pure">
+          <span style="font-size: 1.65rem;" aria-hidden="true">🔥</span>
           <span>CRIMSON</span>
         </button>
-        <button onclick="selectWildColor('yellow')" class="py-5 rounded-2xl card-yellow text-slate-950 font-black text-lg shadow-lg hover:scale-105 transition active:scale-95 flex flex-col items-center gap-1 border-2 border-white">
-          <span class="text-2xl">☀️</span>
+        <button type="button" onclick="selectWildColor('yellow')" class="wild-color-btn card-yellow text-yellow-dark">
+          <span style="font-size: 1.65rem;" aria-hidden="true">☀️</span>
           <span>GOLD</span>
         </button>
-        <button onclick="selectWildColor('green')" class="py-5 rounded-2xl card-green text-white font-black text-lg shadow-lg hover:scale-105 transition active:scale-95 flex flex-col items-center gap-1 border-2 border-white">
-          <span class="text-2xl">🍃</span>
+        <button type="button" onclick="selectWildColor('green')" class="wild-color-btn card-green text-white-pure">
+          <span style="font-size: 1.65rem;" aria-hidden="true">🍃</span>
           <span>EMERALD</span>
         </button>
-        <button onclick="selectWildColor('blue')" class="py-5 rounded-2xl card-blue text-white font-black text-lg shadow-lg hover:scale-105 transition active:scale-95 flex flex-col items-center gap-1 border-2 border-white">
-          <span class="text-2xl">🌊</span>
+        <button type="button" onclick="selectWildColor('blue')" class="wild-color-btn card-blue text-white-pure">
+          <span style="font-size: 1.65rem;" aria-hidden="true">🌊</span>
           <span>COBALT</span>
         </button>
       </div>
@@ -480,65 +281,67 @@
   </div>
 
   <!-- Wild +4 Challenge -->
-  <div id="modal-challenge" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-    <div class="glass-panel max-w-md w-full rounded-3xl p-6 text-center shadow-2xl border border-amber-400/40">
-      <div class="text-4xl mb-2">⚡</div>
-      <h3 id="challenge-title" class="text-xl font-black text-white mb-2">Wild +4 Played Against You!</h3>
-      <p id="challenge-desc" class="text-sm text-slate-300 mb-5"></p>
-      <div class="grid grid-cols-2 gap-3">
-        <button onclick="resolveHumanChallenge(true)" class="py-3.5 px-4 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-sm shadow-lg active:scale-95">
-          🔍 CHALLENGE (+4 or +6)
+  <div id="modal-challenge" class="m3-modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="challenge-title">
+    <div class="m3-dialog" style="text-align: center;">
+      <div style="font-size: 2.5rem; margin-bottom: 0.35rem;" aria-hidden="true">⚡</div>
+      <h2 id="challenge-title" class="m3-dialog-title" style="margin-bottom: 0.5rem;">Wild +4 Played Against You!</h2>
+      <p id="challenge-desc" style="margin: 0 0 1.25rem; font-size: 0.88rem; line-height: 1.5; color: var(--md-sys-color-on-surface-variant);"></p>
+      <div class="form-grid-2">
+        <button type="button" onclick="resolveHumanChallenge(true)" class="m3-btn m3-btn-hero" style="font-size: 0.88rem; min-height: 48px; padding-inline: 1rem;">
+          🔍 Challenge Bluff
         </button>
-        <button onclick="resolveHumanChallenge(false)" class="py-3.5 px-4 rounded-2xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-sm active:scale-95">
-          Accept & Draw 4
+        <button type="button" onclick="resolveHumanChallenge(false)" class="m3-btn m3-btn-tonal">
+          Accept &amp; Draw 4
         </button>
       </div>
     </div>
   </div>
 
   <!-- 7-0 Swap Target -->
-  <div id="modal-swap-target" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-    <div class="glass-panel max-w-sm w-full rounded-3xl p-6 text-center shadow-2xl">
-      <div class="text-3xl mb-1">🔄</div>
-      <h3 class="text-xl font-black text-white mb-1">7-0 Rule: Swap Hands!</h3>
-      <p class="text-xs text-slate-300 mb-4">Choose which player to swap your hand with:</p>
-      <div id="swap-targets-list" class="space-y-2.5"></div>
+  <div id="modal-swap-target" class="m3-modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="title-swap-target">
+    <div class="m3-dialog m3-dialog-sm" style="text-align: center;">
+      <div style="font-size: 2.1rem; margin-bottom: 0.25rem;" aria-hidden="true">🔄</div>
+      <h2 id="title-swap-target" class="m3-dialog-title" style="margin-bottom: 0.25rem;">7-0 Rule: Swap Hands!</h2>
+      <p style="margin: 0 0 1rem; font-size: 0.82rem; color: var(--md-sys-color-on-surface-variant);">Choose which player to swap your hand with:</p>
+      <div id="swap-targets-list" class="mode-list"></div>
     </div>
   </div>
 
   <!-- Pass Device Curtain -->
-  <div id="modal-pass-device" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/95 backdrop-blur-md p-6">
-    <div class="glass-panel max-w-sm w-full rounded-3xl p-8 text-center shadow-2xl border border-indigo-400/30">
-      <div id="pass-next-avatar" class="text-5xl mb-3">👾</div>
-      <h3 class="text-xs uppercase tracking-widest text-indigo-300 font-bold mb-1">Pass Device To</h3>
-      <div id="pass-next-name" class="text-2xl font-black text-white mb-3">Player 2</div>
-      <p class="text-xs text-slate-400 mb-6">Make sure other players look away before revealing cards.</p>
-      <button onclick="confirmPassDevice()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-500 hover:brightness-110 text-white font-black text-base shadow-lg active:scale-95">
-        👁️ I AM READY — SHOW CARDS
+  <div id="modal-pass-device" class="m3-modal-backdrop hidden" style="background: rgba(5, 8, 15, 0.96);" role="dialog" aria-modal="true" aria-labelledby="pass-next-name">
+    <div class="m3-dialog m3-dialog-sm" style="text-align: center; padding: 2rem 1.5rem;">
+      <div id="pass-next-avatar" style="font-size: 3.2rem; margin-bottom: 0.6rem;" aria-hidden="true">👾</div>
+      <div style="font-size: 0.75rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--md-sys-color-primary);">Pass Device To</div>
+      <h2 id="pass-next-name" style="margin: 0.35rem 0 0.75rem; font-size: 1.75rem; font-weight: 900;">Player 2</h2>
+      <p style="margin: 0 0 1.5rem; font-size: 0.82rem; color: var(--md-sys-color-on-surface-variant); line-height: 1.45;">
+        Make sure other players look away before revealing your hand.
+      </p>
+      <button type="button" onclick="confirmPassDevice()" class="m3-btn m3-btn-primary" style="width: 100%; min-height: 52px;">
+        👁️ I Am Ready — Show Cards
       </button>
     </div>
   </div>
 
   <!-- Round End -->
-  <div id="modal-round-end" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
-    <div class="glass-panel max-w-md w-full rounded-3xl p-6 text-center shadow-2xl border border-amber-400/40 my-auto">
-      <div id="end-winner-avatar" class="text-5xl mb-2">🏆</div>
-      <div id="end-subtitle" class="text-xs font-extrabold uppercase tracking-widest text-amber-300">Round Complete!</div>
-      <h2 id="end-winner-title" class="text-2xl sm:text-3xl font-black text-white mt-1 mb-4">Nova Wins!</h2>
+  <div id="modal-round-end" class="m3-modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="end-winner-title">
+    <div class="m3-dialog" style="text-align: center;">
+      <div id="end-winner-avatar" style="font-size: 3rem; margin-bottom: 0.35rem;" aria-hidden="true">🏆</div>
+      <div id="end-subtitle" style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: var(--md-sys-color-tertiary);">Round Complete!</div>
+      <h2 id="end-winner-title" style="margin: 0.3rem 0 1.1rem; font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 900;">King Wins!</h2>
 
-      <div class="bg-slate-950/60 rounded-2xl p-3 mb-5 border border-white/10">
-        <div class="text-[11px] uppercase tracking-wider text-slate-400 font-bold mb-2 flex justify-between px-2">
+      <div class="m3-info-box" style="margin-bottom: 1.25rem; text-align: left;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--md-sys-color-on-surface-variant); padding: 0 0.5rem 0.5rem;">
           <span>Player</span>
           <span>Round / Total</span>
         </div>
-        <div id="end-scoreboard" class="space-y-1.5 text-sm"></div>
+        <div id="end-scoreboard" style="display: flex; flex-direction: column; gap: 0.45rem; font-size: 0.88rem;"></div>
       </div>
 
-      <div class="flex flex-col sm:flex-row gap-2.5">
-        <button id="btn-next-round" onclick="startNextRound()" class="flex-1 py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black text-sm sm:text-base shadow-lg active:scale-95">
+      <div class="form-grid-2">
+        <button id="btn-next-round" type="button" onclick="startRound()" class="m3-btn m3-btn-success">
           Next Round ➔
         </button>
-        <button onclick="returnToMenu()" class="flex-1 py-3.5 px-4 rounded-2xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-sm sm:text-base active:scale-95">
+        <button type="button" onclick="returnToMenu()" class="m3-btn m3-btn-tonal">
           Main Menu
         </button>
       </div>
@@ -546,20 +349,20 @@
   </div>
 
   <!-- Pause Modal -->
-  <div id="modal-pause" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-    <div class="glass-panel max-w-sm w-full rounded-3xl p-6 text-center shadow-2xl">
-      <h3 class="text-2xl font-black text-white mb-5">Game Paused</h3>
-      <div class="space-y-3">
-        <button onclick="resumeGame()" class="w-full py-3.5 rounded-2xl bg-emerald-500 text-slate-950 font-black text-base active:scale-95">
+  <div id="modal-pause" class="m3-modal-backdrop hidden" data-dismissible="true" role="dialog" aria-modal="true" aria-labelledby="title-pause">
+    <div class="m3-dialog m3-dialog-sm" style="text-align: center;">
+      <h2 id="title-pause" class="m3-dialog-title" style="margin-bottom: 1.2rem; justify-content: center;">Game Paused</h2>
+      <div style="display: flex; flex-direction: column; gap: 0.65rem;">
+        <button type="button" onclick="resumeGame()" class="m3-btn m3-btn-success" style="width: 100%;">
           ▶️ Resume Match
         </button>
-        <button onclick="openModal('modal-settings')" class="w-full py-3 rounded-2xl glass-panel hover:bg-slate-800 text-white font-bold text-sm active:scale-95">
-          ⚙️ Audio & Display Settings
+        <button type="button" onclick="openModal('modal-settings')" class="m3-btn m3-btn-tonal" style="width: 100%;">
+          ⚙️ Audio &amp; Display Settings
         </button>
-        <button onclick="restartCurrentMatch()" class="w-full py-3 rounded-2xl bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold text-sm active:scale-95">
+        <button type="button" onclick="restartCurrentMatch()" class="m3-btn m3-btn-warning-tonal" style="width: 100%;">
           🔄 Restart Match
         </button>
-        <button onclick="returnToMenu()" class="w-full py-3 rounded-2xl bg-rose-500/20 border border-rose-500/40 text-rose-300 font-bold text-sm active:scale-95">
+        <button type="button" onclick="returnToMenu()" class="m3-btn m3-btn-danger-tonal" style="width: 100%;">
           🏠 Quit to Main Menu
         </button>
       </div>
@@ -567,46 +370,46 @@
   </div>
 
   <!-- Modes Modal -->
-  <div id="modal-modes" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
-    <div class="glass-panel max-w-lg w-full rounded-3xl p-6 shadow-2xl my-auto">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-xl sm:text-2xl font-black text-white">Select Game Mode</h3>
-        <button onclick="closeModal('modal-modes')" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm font-bold">✕</button>
+  <div id="modal-modes" class="m3-modal-backdrop hidden" data-dismissible="true" role="dialog" aria-modal="true" aria-labelledby="title-modes">
+    <div class="m3-dialog">
+      <div class="m3-dialog-header">
+        <h2 id="title-modes" class="m3-dialog-title">Select Game Mode</h2>
+        <button type="button" onclick="closeModal('modal-modes')" class="m3-icon-btn" aria-label="Close dialog">✕</button>
       </div>
-      <div class="space-y-2.5">
-        <button onclick="launchPresetMode('classic')" class="w-full text-left p-4 rounded-2xl bg-slate-800/70 hover:bg-indigo-600/40 border border-white/10 transition flex items-center gap-3.5 active:scale-98">
-          <span class="text-3xl">🃏</span>
+      <div class="mode-list">
+        <button type="button" onclick="launchPresetMode('classic')" class="mode-card-btn">
+          <span style="font-size: 1.85rem; flex-shrink: 0;" aria-hidden="true">🃏</span>
           <div>
-            <div class="font-extrabold text-white">Classic Mode (4 Players)</div>
-            <div class="text-xs text-slate-300">Official 108-card rules, Medium AI, target 500 pts.</div>
+            <div style="font-weight: 800; font-size: 0.95rem;">Classic Mode (4 Players)</div>
+            <div style="font-size: 0.78rem; color: var(--md-sys-color-on-surface-variant); margin-top: 2px;">Official 108-card rules, Medium AI, target 500 pts.</div>
           </div>
         </button>
-        <button onclick="launchPresetMode('quick')" class="w-full text-left p-4 rounded-2xl bg-slate-800/70 hover:bg-amber-600/40 border border-white/10 transition flex items-center gap-3.5 active:scale-98">
-          <span class="text-3xl">⚡</span>
+        <button type="button" onclick="launchPresetMode('quick')" class="mode-card-btn">
+          <span style="font-size: 1.85rem; flex-shrink: 0;" aria-hidden="true">⚡</span>
           <div>
-            <div class="font-extrabold text-white">Quick Blitz (1v1 Single Round)</div>
-            <div class="text-xs text-slate-300">Fast 2-player duel with 5 starting cards.</div>
+            <div style="font-weight: 800; font-size: 0.95rem;">Quick Blitz (1v1 Single Round)</div>
+            <div style="font-size: 0.78rem; color: var(--md-sys-color-on-surface-variant); margin-top: 2px;">Fast 2-player duel with 5 starting cards.</div>
           </div>
         </button>
-        <button onclick="launchPresetMode('challenge')" class="w-full text-left p-4 rounded-2xl bg-slate-800/70 hover:bg-rose-600/40 border border-white/10 transition flex items-center gap-3.5 active:scale-98">
-          <span class="text-3xl">🔥</span>
+        <button type="button" onclick="launchPresetMode('challenge')" class="mode-card-btn">
+          <span style="font-size: 1.85rem; flex-shrink: 0;" aria-hidden="true">🔥</span>
           <div>
-            <div class="font-extrabold text-white">Grandmaster Challenge (Hard AI)</div>
-            <div class="text-xs text-slate-300">3 tactical Hard AI opponents who challenge bluffs.</div>
+            <div style="font-weight: 800; font-size: 0.95rem;">Grandmaster Challenge (Hard AI)</div>
+            <div style="font-size: 0.78rem; color: var(--md-sys-color-on-surface-variant); margin-top: 2px;">3 tactical Hard AI opponents who challenge bluffs.</div>
           </div>
         </button>
-        <button onclick="launchPresetMode('practice')" class="w-full text-left p-4 rounded-2xl bg-slate-800/70 hover:bg-emerald-600/40 border border-white/10 transition flex items-center gap-3.5 active:scale-98">
-          <span class="text-3xl">🎓</span>
+        <button type="button" onclick="launchPresetMode('practice')" class="mode-card-btn">
+          <span style="font-size: 1.85rem; flex-shrink: 0;" aria-hidden="true">🎓</span>
           <div>
-            <div class="font-extrabold text-white">Relaxed Practice</div>
-            <div class="text-xs text-slate-300">Easy AI opponents, single round learning.</div>
+            <div style="font-weight: 800; font-size: 0.95rem;">Relaxed Practice</div>
+            <div style="font-size: 0.78rem; color: var(--md-sys-color-on-surface-variant); margin-top: 2px;">Easy AI opponents, single round learning.</div>
           </div>
         </button>
-        <button onclick="launchPresetMode('local')" class="w-full text-left p-4 rounded-2xl bg-slate-800/70 hover:bg-sky-600/40 border border-white/10 transition flex items-center gap-3.5 active:scale-98">
-          <span class="text-3xl">👥</span>
+        <button type="button" onclick="launchPresetMode('local')" class="mode-card-btn">
+          <span style="font-size: 1.85rem; flex-shrink: 0;" aria-hidden="true">👥</span>
           <div>
-            <div class="font-extrabold text-white">Local Pass & Play (2 Humans)</div>
-            <div class="text-xs text-slate-300">Play on one screen with privacy curtains.</div>
+            <div style="font-weight: 800; font-size: 0.95rem;">Local Pass &amp; Play (2 Humans)</div>
+            <div style="font-size: 0.78rem; color: var(--md-sys-color-on-surface-variant); margin-top: 2px;">Play on one screen with privacy curtains.</div>
           </div>
         </button>
       </div>
@@ -614,18 +417,18 @@
   </div>
 
   <!-- Custom Match Modal -->
-  <div id="modal-custom" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
-    <div class="glass-panel max-w-lg w-full rounded-3xl p-5 sm:p-6 shadow-2xl my-auto max-h-[90vh] overflow-y-auto">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-xl font-black text-white">Custom Match & Rules</h3>
-        <button onclick="closeModal('modal-custom')" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm font-bold">✕</button>
+  <div id="modal-custom" class="m3-modal-backdrop hidden" data-dismissible="true" role="dialog" aria-modal="true" aria-labelledby="title-custom">
+    <div class="m3-dialog">
+      <div class="m3-dialog-header">
+        <h2 id="title-custom" class="m3-dialog-title">Custom Match &amp; Rules</h2>
+        <button type="button" onclick="closeModal('modal-custom')" class="m3-icon-btn" aria-label="Close dialog">✕</button>
       </div>
 
-      <div class="space-y-4 text-sm">
-        <div class="grid grid-cols-2 gap-3">
+      <div style="display: flex; flex-direction: column; gap: 1rem;">
+        <div class="form-grid-2">
           <div>
-            <label class="block text-xs font-bold text-slate-300 mb-1">Total Players (2–6)</label>
-            <select id="cfg-player-count" class="w-full bg-slate-900 border border-white/15 rounded-xl px-3 py-2 text-white font-bold">
+            <label for="cfg-player-count" class="field-label">Total Players (2–6)</label>
+            <select id="cfg-player-count" class="m3-field">
               <option value="2">2 Players</option>
               <option value="3">3 Players</option>
               <option value="4" selected>4 Players</option>
@@ -634,34 +437,34 @@
             </select>
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-300 mb-1">Opponent Type</label>
-            <select id="cfg-opponent-type" class="w-full bg-slate-900 border border-white/15 rounded-xl px-3 py-2 text-white font-bold">
+            <label for="cfg-opponent-type" class="field-label">Opponent Type</label>
+            <select id="cfg-opponent-type" class="m3-field">
               <option value="ai">Computer AI</option>
-              <option value="local">Local Pass & Play (All Human)</option>
+              <option value="local">Local Pass &amp; Play (Humans)</option>
             </select>
           </div>
         </div>
 
-        <div class="grid grid-cols-3 gap-2.5">
+        <div class="form-grid-3">
           <div>
-            <label class="block text-xs font-bold text-slate-300 mb-1">AI Difficulty</label>
-            <select id="cfg-ai-diff" class="w-full bg-slate-900 border border-white/15 rounded-xl px-2.5 py-2 text-white font-bold">
+            <label for="cfg-ai-diff" class="field-label">AI Difficulty</label>
+            <select id="cfg-ai-diff" class="m3-field">
               <option value="easy">Easy</option>
               <option value="medium" selected>Medium</option>
               <option value="hard">Hard</option>
             </select>
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-300 mb-1">Start Cards</label>
-            <select id="cfg-hand-size" class="w-full bg-slate-900 border border-white/15 rounded-xl px-2.5 py-2 text-white font-bold">
+            <label for="cfg-hand-size" class="field-label">Start Cards</label>
+            <select id="cfg-hand-size" class="m3-field">
               <option value="5">5 Cards</option>
               <option value="7" selected>7 Cards</option>
               <option value="10">10 Cards</option>
             </select>
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-300 mb-1">Score Target</label>
-            <select id="cfg-score-target" class="w-full bg-slate-900 border border-white/15 rounded-xl px-2.5 py-2 text-white font-bold">
+            <label for="cfg-score-target" class="field-label">Score Target</label>
+            <select id="cfg-score-target" class="m3-field">
               <option value="0">1 Round</option>
               <option value="100">100 Pts</option>
               <option value="200">200 Pts</option>
@@ -671,89 +474,109 @@
           </div>
         </div>
 
-        <div class="border-t border-white/10 pt-3">
-          <div class="text-xs font-extrabold uppercase tracking-wider text-indigo-300 mb-2.5">Optional House Rules</div>
-          <div class="space-y-2.5">
-            <label class="flex items-start gap-3 p-2.5 rounded-xl bg-slate-900/70 border border-white/10 cursor-pointer">
-              <input id="hr-stacking" type="checkbox" class="mt-1 w-4 h-4 accent-indigo-500">
+        <div style="border-top: 1px solid var(--md-sys-color-outline-variant); padding-top: 0.85rem;">
+          <div style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--md-sys-color-primary); margin-bottom: 0.6rem;">Optional House Rules</div>
+          <div style="display: flex; flex-direction: column; gap: 0.55rem;">
+            <label class="rule-toggle-row" for="hr-stacking">
               <div>
-                <div class="font-bold text-white text-xs sm:text-sm">Draw-Card Stacking (+2 on +2, +4 on +4)</div>
-                <div class="text-[11px] text-slate-400">Pass a draw penalty to next player with matching card.</div>
+                <div style="font-weight: 700; font-size: 0.86rem;">Draw-Card Stacking (+2 / +4)</div>
+                <div style="font-size: 0.74rem; color: var(--md-sys-color-on-surface-variant);">Pass draw penalties with a matching +2 or +4.</div>
               </div>
+              <span class="m3-switch">
+                <input id="hr-stacking" type="checkbox" />
+                <span class="m3-switch-track"><span class="m3-switch-thumb"></span></span>
+              </span>
             </label>
 
-            <label class="flex items-start gap-3 p-2.5 rounded-xl bg-slate-900/70 border border-white/10 cursor-pointer">
-              <input id="hr-seven-zero" type="checkbox" class="mt-1 w-4 h-4 accent-indigo-500">
+            <label class="rule-toggle-row" for="hr-seven-zero">
               <div>
-                <div class="font-bold text-white text-xs sm:text-sm">Seven-Zero Hand Swap</div>
-                <div class="text-[11px] text-slate-400">Playing a 0 rotates hands; playing a 7 lets you swap hands.</div>
+                <div style="font-weight: 700; font-size: 0.86rem;">Seven-Zero Hand Swap</div>
+                <div style="font-size: 0.74rem; color: var(--md-sys-color-on-surface-variant);">Playing 0 rotates all hands; playing 7 swaps hands.</div>
               </div>
+              <span class="m3-switch">
+                <input id="hr-seven-zero" type="checkbox" />
+                <span class="m3-switch-track"><span class="m3-switch-thumb"></span></span>
+              </span>
             </label>
 
-            <label class="flex items-start gap-3 p-2.5 rounded-xl bg-slate-900/70 border border-white/10 cursor-pointer">
-              <input id="hr-jump-in" type="checkbox" class="mt-1 w-4 h-4 accent-indigo-500">
+            <label class="rule-toggle-row" for="hr-jump-in">
               <div>
-                <div class="font-bold text-white text-xs sm:text-sm">Jump-In (Exact Match Interrupt)</div>
-                <div class="text-[11px] text-slate-400">Play an identical card immediately out of turn.</div>
+                <div style="font-weight: 700; font-size: 0.86rem;">Jump-In (Exact Match)</div>
+                <div style="font-size: 0.74rem; color: var(--md-sys-color-on-surface-variant);">Play an identical card immediately out of turn.</div>
               </div>
+              <span class="m3-switch">
+                <input id="hr-jump-in" type="checkbox" />
+                <span class="m3-switch-track"><span class="m3-switch-thumb"></span></span>
+              </span>
             </label>
 
-            <label class="flex items-start gap-3 p-2.5 rounded-xl bg-slate-900/70 border border-white/10 cursor-pointer">
-              <input id="hr-draw-until" type="checkbox" class="mt-1 w-4 h-4 accent-indigo-500">
+            <label class="rule-toggle-row" for="hr-draw-until">
               <div>
-                <div class="font-bold text-white text-xs sm:text-sm">Draw Until Playable</div>
-                <div class="text-[11px] text-slate-400">Keep drawing automatically until pulling a playable card.</div>
+                <div style="font-weight: 700; font-size: 0.86rem;">Draw Until Playable</div>
+                <div style="font-size: 0.74rem; color: var(--md-sys-color-on-surface-variant);">Keep drawing automatically until pulling a match.</div>
               </div>
+              <span class="m3-switch">
+                <input id="hr-draw-until" type="checkbox" />
+                <span class="m3-switch-track"><span class="m3-switch-thumb"></span></span>
+              </span>
             </label>
           </div>
         </div>
 
-        <button onclick="startCustomMatch()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-black text-base shadow-lg active:scale-95">
-          🚀 START CUSTOM MATCH
+        <button type="button" onclick="startCustomMatch()" class="m3-btn m3-btn-hero" style="width: 100%;">
+          👑 Start Custom Match
         </button>
       </div>
     </div>
   </div>
 
   <!-- Profile Modal -->
-  <div id="modal-profile" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
-    <div class="glass-panel max-w-md w-full rounded-3xl p-6 shadow-2xl my-auto">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-xl font-black text-white">Player Profile & Style</h3>
-        <button onclick="closeModal('modal-profile')" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm font-bold">✕</button>
+  <div id="modal-profile" class="m3-modal-backdrop hidden" data-dismissible="true" role="dialog" aria-modal="true" aria-labelledby="title-profile">
+    <div class="m3-dialog">
+      <div class="m3-dialog-header">
+        <h2 id="title-profile" class="m3-dialog-title">Player Profile &amp; Style</h2>
+        <button type="button" onclick="closeModal('modal-profile')" class="m3-icon-btn" aria-label="Close dialog">✕</button>
       </div>
 
-      <div class="space-y-4">
+      <div style="display: flex; flex-direction: column; gap: 1rem;">
         <div>
-          <label class="block text-xs font-bold text-slate-300 mb-1">Display Name</label>
-          <input id="prof-name-input" type="text" maxlength="16" placeholder="Enter name" class="w-full bg-slate-900 border border-white/20 rounded-xl px-3.5 py-2.5 text-white font-bold focus:outline-none focus:border-indigo-400">
+          <label for="prof-name-input" class="field-label">Display Name</label>
+          <input id="prof-name-input" type="text" maxlength="16" placeholder="Enter name" class="m3-field" />
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-slate-300 mb-1.5">Choose Avatar</label>
-          <div id="prof-avatar-grid" class="grid grid-cols-6 gap-2"></div>
+          <span class="field-label">Choose Avatar</span>
+          <div id="prof-avatar-grid" class="avatar-grid"></div>
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-slate-300 mb-1.5">Card Back Theme</label>
-          <div class="grid grid-cols-3 gap-2">
-            <button type="button" onclick="selectCardBack('prism')" data-cb="prism" class="cb-opt p-2.5 rounded-xl border border-white/20 bg-slate-900 text-xs font-bold text-center">🌌 Prism</button>
-            <button type="button" onclick="selectCardBack('solar')" data-cb="solar" class="cb-opt p-2.5 rounded-xl border border-white/20 bg-slate-900 text-xs font-bold text-center">🔥 Solar</button>
-            <button type="button" onclick="selectCardBack('matrix')" data-cb="matrix" class="cb-opt p-2.5 rounded-xl border border-white/20 bg-slate-900 text-xs font-bold text-center">💚 Matrix</button>
+          <span class="field-label">Card Back Theme</span>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem;">
+            <button type="button" onclick="selectCardBack('prism')" data-cb="prism" class="cb-opt choice-pill">👑 Royal</button>
+            <button type="button" onclick="selectCardBack('solar')" data-cb="solar" class="cb-opt choice-pill">🔥 Solar</button>
+            <button type="button" onclick="selectCardBack('matrix')" data-cb="matrix" class="cb-opt choice-pill">💚 Matrix</button>
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-slate-300 mb-1.5">Arena Background</label>
-          <div class="grid grid-cols-2 gap-2">
-            <button type="button" onclick="selectBgTheme('bg-nebula')" data-bg="bg-nebula" class="bg-opt p-2.5 rounded-xl border border-white/20 bg-slate-900 text-xs font-bold">Cosmic Nebula</button>
-            <button type="button" onclick="selectBgTheme('bg-abyss')" data-bg="bg-abyss" class="bg-opt p-2.5 rounded-xl border border-white/20 bg-slate-900 text-xs font-bold">Deep Cobalt</button>
-            <button type="button" onclick="selectBgTheme('bg-cyber')" data-bg="bg-cyber" class="bg-opt p-2.5 rounded-xl border border-white/20 bg-slate-900 text-xs font-bold">Emerald Grid</button>
-            <button type="button" onclick="selectBgTheme('bg-solar')" data-bg="bg-solar" class="bg-opt p-2.5 rounded-xl border border-white/20 bg-slate-900 text-xs font-bold">Solar Flare</button>
+          <span class="field-label">Arena Background</span>
+          <div class="background-grid" style="gap: 0.5rem;">
+            <button type="button" onclick="selectBgTheme('bg-nebula')" data-bg="bg-nebula" class="bg-opt choice-pill">Cosmic Nebula</button>
+            <button type="button" onclick="selectBgTheme('bg-abyss')" data-bg="bg-abyss" class="bg-opt choice-pill">Deep Cobalt</button>
+            <button type="button" onclick="selectBgTheme('bg-cyber')" data-bg="bg-cyber" class="bg-opt choice-pill">Emerald Grid</button>
+            <button type="button" onclick="selectBgTheme('bg-solar')" data-bg="bg-solar" class="bg-opt choice-pill">Solar Flare</button>
+            <button type="button" onclick="selectBgTheme('bg-royal')" data-bg="bg-royal" class="bg-opt choice-pill">Royal Crimson</button>
+            <button type="button" onclick="selectBgTheme('bg-void')" data-bg="bg-void" class="bg-opt choice-pill">Obsidian Void</button>
+            <button type="button" onclick="selectBgTheme('bg-frost')" data-bg="bg-frost" class="bg-opt choice-pill">Frozen Palace</button>
+            <button type="button" onclick="selectBgTheme('bg-jungle')" data-bg="bg-jungle" class="bg-opt choice-pill">Wild Kingdom</button>
+            <button type="button" onclick="selectBgTheme('bg-sunset')" data-bg="bg-sunset" class="bg-opt choice-pill">Battle Sunset</button>
+            <button type="button" onclick="selectBgTheme('bg-galaxy')" data-bg="bg-galaxy" class="bg-opt choice-pill">King's Galaxy</button>
+            <button type="button" onclick="selectBgTheme('bg-mint')" data-bg="bg-mint" class="bg-opt choice-pill">Mint Citadel</button>
+            <button type="button" onclick="selectBgTheme('bg-gold')" data-bg="bg-gold" class="bg-opt choice-pill">Golden Throne</button>
           </div>
         </div>
 
-        <button onclick="saveProfile()" class="w-full py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-sm active:scale-95">
+        <button type="button" onclick="saveProfile()" class="m3-btn m3-btn-primary" style="width: 100%;">
           Save Profile
         </button>
       </div>
@@ -761,55 +584,63 @@
   </div>
 
   <!-- Settings Modal -->
-  <div id="modal-settings" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-    <div class="glass-panel max-w-md w-full rounded-3xl p-6 shadow-2xl">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-xl font-black text-white">Settings</h3>
-        <button onclick="closeModal('modal-settings')" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm font-bold">✕</button>
+  <div id="modal-settings" class="m3-modal-backdrop hidden" data-dismissible="true" role="dialog" aria-modal="true" aria-labelledby="title-settings">
+    <div class="m3-dialog">
+      <div class="m3-dialog-header">
+        <h2 id="title-settings" class="m3-dialog-title">Settings</h2>
+        <button type="button" onclick="closeModal('modal-settings')" class="m3-icon-btn" aria-label="Close dialog">✕</button>
       </div>
 
-      <div class="space-y-4 text-sm">
-        <div class="flex items-center justify-between">
-          <span class="font-bold">Sound Effects (SFX)</span>
-          <input id="set-sfx-enabled" type="checkbox" checked onchange="updateAudioSettings()" class="w-5 h-5 accent-indigo-500">
+      <div style="display: flex; flex-direction: column; gap: 0.9rem;">
+        <div class="rule-toggle-row">
+          <label for="set-sfx-enabled" style="font-weight: 700; font-size: 0.9rem; cursor: pointer;">Sound Effects (SFX)</label>
+          <label class="m3-switch">
+            <input id="set-sfx-enabled" type="checkbox" checked onchange="updateAudioSettings()" />
+            <span class="m3-switch-track"><span class="m3-switch-thumb"></span></span>
+          </label>
         </div>
+
         <div>
-          <div class="flex justify-between text-xs text-slate-300 mb-1">
-            <span>SFX Volume</span>
+          <div style="display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--md-sys-color-on-surface-variant); font-weight: 700;">
+            <label for="set-sfx-vol">SFX Volume</label>
             <span id="set-sfx-val">80%</span>
           </div>
-          <input id="set-sfx-vol" type="range" min="0" max="100" value="80" oninput="updateAudioSettings()" class="w-full accent-indigo-500">
+          <input id="set-sfx-vol" type="range" min="0" max="100" value="80" oninput="updateAudioSettings()" class="m3-range" />
         </div>
 
-        <div class="flex items-center justify-between pt-2 border-t border-white/10">
-          <span class="font-bold">Ambient Synth Music</span>
-          <input id="set-music-enabled" type="checkbox" checked onchange="updateAudioSettings()" class="w-5 h-5 accent-indigo-500">
+        <div class="rule-toggle-row">
+          <label for="set-music-enabled" style="font-weight: 700; font-size: 0.9rem; cursor: pointer;">Ambient Synth Music</label>
+          <label class="m3-switch">
+            <input id="set-music-enabled" type="checkbox" checked onchange="updateAudioSettings()" />
+            <span class="m3-switch-track"><span class="m3-switch-thumb"></span></span>
+          </label>
         </div>
+
         <div>
-          <div class="flex justify-between text-xs text-slate-300 mb-1">
-            <span>Music Volume</span>
+          <div style="display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--md-sys-color-on-surface-variant); font-weight: 700;">
+            <label for="set-music-vol">Music Volume</label>
             <span id="set-music-val">35%</span>
           </div>
-          <input id="set-music-vol" type="range" min="0" max="100" value="35" oninput="updateAudioSettings()" class="w-full accent-indigo-500">
+          <input id="set-music-vol" type="range" min="0" max="100" value="35" oninput="updateAudioSettings()" class="m3-range" />
         </div>
 
-        <div class="flex items-center justify-between pt-2 border-t border-white/10">
+        <div class="rule-toggle-row">
           <div>
-            <div class="font-bold">Reduce Animations</div>
-            <div class="text-[11px] text-slate-400">Minimizes motion effects</div>
+            <label for="set-reduce-anim" style="font-weight: 700; font-size: 0.9rem; cursor: pointer; display: block;">Reduce Animations</label>
+            <span style="font-size: 0.74rem; color: var(--md-sys-color-on-surface-variant);">Minimizes motion &amp; transitions</span>
           </div>
-          <input id="set-reduce-anim" type="checkbox" onchange="updateDisplaySettings()" class="w-5 h-5 accent-indigo-500">
+          <label class="m3-switch">
+            <input id="set-reduce-anim" type="checkbox" onchange="updateDisplaySettings()" />
+            <span class="m3-switch-track"><span class="m3-switch-thumb"></span></span>
+          </label>
         </div>
 
-        <div class="pt-3 border-t border-white/10 flex justify-between items-center gap-2">
-          <button id="btn-reset-stats" onclick="confirmResetData()" class="px-3 py-2 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-bold hover:bg-rose-500/30">
+        <div style="border-top: 1px solid var(--md-sys-color-outline-variant); padding-top: 0.9rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.5rem;">
+          <button id="btn-reset-stats" type="button" onclick="confirmResetData()" class="m3-btn m3-btn-danger-tonal" style="font-size: 0.8rem; padding-inline: 0.9rem;">
             Reset Stats
           </button>
-          <div class="flex items-center gap-2">
-            <button onclick="openPwaInfoModal()" class="px-3 py-2 rounded-xl bg-indigo-500/20 border border-indigo-400/40 text-indigo-200 text-xs font-bold hover:bg-indigo-500/30">
-              📲 PWA Studio
-            </button>
-            <button onclick="closeModal('modal-settings')" class="px-4 py-2 rounded-xl bg-indigo-600 text-white font-bold text-xs">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <button type="button" onclick="closeModal('modal-settings')" class="m3-btn m3-btn-primary" style="font-size: 0.85rem;">
               Done
             </button>
           </div>
@@ -819,18 +650,20 @@
   </div>
 
   <!-- Rules Modal -->
-  <div id="modal-rules" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
-    <div class="glass-panel max-w-lg w-full rounded-3xl p-6 shadow-2xl my-auto max-h-[88vh] overflow-y-auto">
-      <div class="flex items-center justify-between mb-3">
-        <h3 class="text-xl font-black text-white">Rules & Card Guide</h3>
-        <button onclick="closeModal('modal-rules')" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm font-bold">✕</button>
+  <div id="modal-rules" class="m3-modal-backdrop hidden" data-dismissible="true" role="dialog" aria-modal="true" aria-labelledby="title-rules">
+    <div class="m3-dialog">
+      <div class="m3-dialog-header">
+        <h2 id="title-rules" class="m3-dialog-title">Rules &amp; Card Guide</h2>
+        <button type="button" onclick="closeModal('modal-rules')" class="m3-icon-btn" aria-label="Close dialog">✕</button>
       </div>
-      <div class="space-y-3 text-xs sm:text-sm text-slate-200 leading-relaxed">
-        <p><strong class="text-amber-300">Objective:</strong> Empty your hand first! Match the discard pile by <strong>Colour</strong>, <strong>Number</strong>, or <strong>Symbol</strong>, or play a <strong>Wild</strong> card.</p>
+      <div style="display: flex; flex-direction: column; gap: 0.85rem; font-size: 0.88rem; line-height: 1.55; color: var(--md-sys-color-on-surface-variant);">
+        <p style="margin: 0; color: var(--md-sys-color-on-surface);">
+          <strong style="color: var(--md-sys-color-tertiary);">Objective:</strong> Empty your hand first! Match the top discard card by <strong>Colour</strong>, <strong>Number</strong>, or <strong>Symbol</strong>, or play a <strong>Wild</strong> card.
+        </p>
 
-        <div class="bg-slate-900/80 p-3 rounded-2xl border border-white/10 space-y-1.5">
-          <div class="font-extrabold text-indigo-300 uppercase text-xs">Colour-Blind Emblems</div>
-          <div class="grid grid-cols-2 gap-1.5 text-xs">
+        <div class="m3-info-box">
+          <div style="font-size: 0.74rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--md-sys-color-primary); margin-bottom: 0.45rem;">Colour-Blind Suit Emblems</div>
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.4rem; font-size: 0.82rem; color: var(--md-sys-color-on-surface);">
             <div>🔥 <strong>Crimson</strong> — Flame</div>
             <div>☀️ <strong>Gold</strong> — Sun</div>
             <div>🍃 <strong>Emerald</strong> — Leaf</div>
@@ -838,154 +671,71 @@
           </div>
         </div>
 
-        <div class="space-y-1.5">
-          <div><strong class="text-rose-400">⊘ Skip (20 pts):</strong> Next player loses turn.</div>
-          <div><strong class="text-sky-400">⇄ Reverse (20 pts):</strong> Reverse direction (2-player: acts as Skip).</div>
-          <div><strong class="text-emerald-400">+2 Draw Two (20 pts):</strong> Next player draws 2 cards & skips.</div>
-          <div><strong class="text-purple-400">✦ Wild (50 pts):</strong> Play anytime, pick next colour.</div>
-          <div><strong class="text-amber-400">✦+4 Wild Draw Four (50 pts):</strong> Pick colour + next player draws 4 & skips. Legal only if holding no current colour cards (otherwise challengeable!).</div>
+        <div style="display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.84rem;">
+          <div><strong style="color: #ff899d;">⊘ Skip (20 pts):</strong> Next player loses their turn.</div>
+          <div><strong style="color: #7dd3fc;">⇄ Reverse (20 pts):</strong> Reverses play order (2-player: acts as Skip).</div>
+          <div><strong style="color: #6ee7b7;">+2 Draw Two (20 pts):</strong> Next player draws 2 cards &amp; skips.</div>
+          <div><strong style="color: #d8b4fe;">✦ Wild (50 pts):</strong> Play anytime and choose the next suit.</div>
+          <div><strong style="color: #fcd34d;">✦+4 Wild Draw Four (50 pts):</strong> Choose colour + next player draws 4 &amp; skips. Legal only if holding no matching colour card — otherwise opponents can challenge!</div>
         </div>
 
-        <p><strong class="text-pink-400">PRISM! Rule:</strong> When down to 1 card, press <strong>PRISM!</strong> before next turn begins. If caught, draw <strong>+2 penalty cards</strong>!</p>
+        <p style="margin: 0; color: var(--md-sys-color-on-surface);">
+          <strong style="color: #f472b6;">KING! Rule:</strong> When down to 1 card, tap <strong>KING!</strong> before the next turn begins, or opponents can catch you for <strong>+2 penalty cards</strong>!
+        </p>
       </div>
     </div>
   </div>
 
   <!-- Stats Modal -->
-  <div id="modal-stats" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
-    <div class="glass-panel max-w-lg w-full rounded-3xl p-6 shadow-2xl my-auto max-h-[88vh] overflow-y-auto">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-xl font-black text-white">Career Stats & Medals</h3>
-        <button onclick="closeModal('modal-stats')" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm font-bold">✕</button>
+  <div id="modal-stats" class="m3-modal-backdrop hidden" data-dismissible="true" role="dialog" aria-modal="true" aria-labelledby="title-stats">
+    <div class="m3-dialog">
+      <div class="m3-dialog-header">
+        <h2 id="title-stats" class="m3-dialog-title">Career Stats &amp; Medals</h2>
+        <button type="button" onclick="closeModal('modal-stats')" class="m3-icon-btn" aria-label="Close dialog">✕</button>
       </div>
-      <div id="stats-grid" class="grid grid-cols-3 gap-2.5 mb-5"></div>
-      <h4 class="text-xs font-extrabold uppercase tracking-wider text-amber-300 mb-2.5">Achievements</h4>
-      <div id="achievements-list" class="space-y-2"></div>
+      <div id="stats-grid" class="stats-grid"></div>
+      <h3 style="margin: 0 0 0.6rem; font-size: 0.76rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--md-sys-color-tertiary);">Achievements</h3>
+      <div id="achievements-list" style="display: flex; flex-direction: column; gap: 0.55rem;"></div>
     </div>
   </div>
 
   <!-- About Modal -->
-  <div id="modal-about" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-    <div class="glass-panel max-w-md w-full rounded-3xl p-6 shadow-2xl text-sm text-slate-200">
-      <div class="flex items-center justify-between mb-3">
-        <h3 class="text-xl font-black text-white">About PRISM CLASH</h3>
-        <button onclick="closeModal('modal-about')" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm font-bold">✕</button>
+  <div id="modal-about" class="m3-modal-backdrop hidden" data-dismissible="true" role="dialog" aria-modal="true" aria-labelledby="title-about">
+    <div class="m3-dialog">
+      <div class="m3-dialog-header">
+        <h2 id="title-about" class="m3-dialog-title">About KING BATTLE</h2>
+        <button type="button" onclick="closeModal('modal-about')" class="m3-icon-btn" aria-label="Close dialog">✕</button>
       </div>
-      <p class="mb-3 text-xs sm:text-sm text-slate-300">
-        Original cosmic 108-card shedding game crafted with Web Audio synthesis and relative path PWA tooling for GitHub Pages.
+      <p style="margin: 0 0 0.9rem; font-size: 0.86rem; line-height: 1.5; color: var(--md-sys-color-on-surface-variant);">
+        Cosmic 108-card tactical shedding game built with Google Material Design 3 principles, procedural Web Audio synthesis, full responsiveness, and offline-first Progressive Web App support.
       </p>
-      <div class="bg-slate-900/80 p-3.5 rounded-2xl border border-white/10 text-xs space-y-1 mb-4">
-        <div class="font-bold text-indigo-300 mb-1">Standard 108-Card Deck:</div>
-        <div class="flex justify-between"><span>Number 0 (1/colour)</span><span class="font-bold">4 cards</span></div>
-        <div class="flex justify-between"><span>Numbers 1–9 (2/colour)</span><span class="font-bold">72 cards</span></div>
-        <div class="flex justify-between"><span>Skip, Reverse, +2 (2 each)</span><span class="font-bold">24 cards</span></div>
-        <div class="flex justify-between"><span>Wild & Wild +4 (4 each)</span><span class="font-bold">8 cards</span></div>
-        <div class="flex justify-between border-t border-white/10 pt-1 text-amber-300 font-extrabold"><span>Total Deck</span><span>108 cards</span></div>
+      <div class="m3-info-box" style="font-size: 0.82rem; display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 1.1rem;">
+        <div style="font-weight: 800; color: var(--md-sys-color-primary); margin-bottom: 0.2rem;">Official 108-Card Deck Breakdown</div>
+        <div style="display: flex; justify-content: space-between;"><span>Number 0 (1 per suit)</span><strong>4 cards</strong></div>
+        <div style="display: flex; justify-content: space-between;"><span>Numbers 1–9 (2 per suit)</span><strong>72 cards</strong></div>
+        <div style="display: flex; justify-content: space-between;"><span>Skip, Reverse, +2 (2 each/suit)</span><strong>24 cards</strong></div>
+        <div style="display: flex; justify-content: space-between;"><span>Wild &amp; Wild +4 (4 each)</span><strong>8 cards</strong></div>
+        <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--md-sys-color-outline-variant); padding-top: 0.4rem; margin-top: 0.2rem; color: var(--md-sys-color-tertiary); font-weight: 800;">
+          <span>Total Official Deck</span><span>108 cards</span>
+        </div>
       </div>
-      <div class="flex items-center gap-2">
-        <button onclick="closeModal('modal-about'); openPwaInfoModal();" class="flex-1 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs">
-          📲 PWA Studio & Files
+      <div class="form-grid-2">
+        <button type="button" onclick="closeModal('modal-about')" class="m3-btn m3-btn-primary" style="font-size: 0.85rem; grid-column: 1 / -1;">
+          Close
         </button>
-        <button onclick="closeModal('modal-about')" class="flex-1 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-xs">Close</button>
       </div>
     </div>
   </div>
 
-  <!-- GitHub Pages PWA Studio & Diagnostics Modal -->
-  <div id="modal-pwa" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
-    <div class="glass-panel max-w-2xl w-full rounded-3xl p-5 sm:p-6 shadow-2xl my-auto max-h-[90vh] overflow-y-auto text-xs sm:text-sm text-slate-200">
-      <div class="flex items-center justify-between mb-3">
-        <h3 class="text-xl font-black text-white flex items-center gap-2">
-          <span>📲</span> <span>GitHub Pages PWA Studio</span>
-        </h3>
-        <button onclick="closeModal('modal-pwa')" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm font-bold">✕</button>
-      </div>
+  <!-- Material 3 PWA Update Snackbar -->
 
-      <div id="pwa-origin-callout" class="p-3.5 rounded-2xl border mb-4 text-xs leading-relaxed">
-        <div id="pwa-origin-badge" class="font-black uppercase tracking-wider mb-1">Checking Origin...</div>
-        <p id="pwa-origin-explanation" class="text-slate-200"></p>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-4 text-xs">
-        <div class="bg-slate-900/80 border border-white/10 rounded-2xl p-3">
-          <div class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Origin / Path</div>
-          <div id="pwa-diag-protocol" class="font-bold text-white mt-0.5 break-all"></div>
-        </div>
-        <div class="bg-slate-900/80 border border-white/10 rounded-2xl p-3">
-          <div class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Environment Type</div>
-          <div id="pwa-diag-origin-type" class="font-bold text-indigo-300 mt-0.5"></div>
-        </div>
-        <div class="bg-slate-900/80 border border-white/10 rounded-2xl p-3">
-          <div class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Display Mode</div>
-          <div id="pwa-diag-display" class="font-bold text-sky-300 mt-0.5"></div>
-        </div>
-        <div class="bg-slate-900/80 border border-white/10 rounded-2xl p-3">
-          <div class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Service Worker (./sw.js)</div>
-          <div id="pwa-diag-sw" class="font-bold text-amber-300 mt-0.5"></div>
-        </div>
-      </div>
-
-      <div class="bg-slate-900/80 border border-white/10 rounded-2xl p-3.5 mb-4 text-xs">
-        <div class="font-extrabold uppercase tracking-wider text-indigo-300 mb-2">GitHub Pages Subpath Folder Layout</div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 font-mono text-[11px] text-slate-200">
-          <div class="flex items-center gap-2"><span class="text-emerald-400">✓</span> <span>./index.html</span></div>
-          <div class="flex items-center gap-2"><span class="text-emerald-400">✓</span> <span>./manifest.json</span></div>
-          <div class="flex items-center gap-2"><span class="text-emerald-400">✓</span> <span>./sw.js</span></div>
-          <div class="flex items-center gap-2"><span class="text-emerald-400">✓</span> <span>./icons/icon-192.png</span></div>
-          <div class="flex items-center gap-2"><span class="text-emerald-400">✓</span> <span>./icons/icon-512.png</span></div>
-        </div>
-      </div>
-
-      <div class="bg-slate-900/80 border border-white/10 rounded-2xl p-3.5 mb-4">
-        <div class="flex items-center justify-between gap-2 flex-wrap mb-2.5">
-          <span class="text-xs font-extrabold uppercase tracking-wider text-amber-300">Download Ready PWA Files</span>
-          <button type="button" onclick="downloadAllPwaFiles()" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black text-xs active:scale-95">
-            ⬇️ Download All PWA Files
-          </button>
-        </div>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <button type="button" onclick="downloadPwaFileByName('manifest')" class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/10 text-white font-bold text-xs active:scale-95">
-            📄 manifest.json
-          </button>
-          <button type="button" onclick="downloadPwaFileByName('sw')" class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/10 text-white font-bold text-xs active:scale-95">
-            ⚙️ sw.js
-          </button>
-          <button type="button" onclick="downloadPngIconAsset(192, 'icon-192.png', false)" class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/10 text-white font-bold text-xs active:scale-95">
-            🖼️ icon-192.png
-          </button>
-          <button type="button" onclick="downloadPngIconAsset(512, 'icon-512.png', true)" class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/10 text-white font-bold text-xs active:scale-95">
-            🖼️ icon-512.png
-          </button>
-        </div>
-      </div>
-
-      <div class="flex items-center justify-between gap-2 flex-wrap mb-2">
-        <div class="flex items-center gap-1.5 flex-wrap">
-          <button id="tab-pwa-manifest" type="button" onclick="switchPwaCodeTab('manifest')" class="px-3 py-1.5 rounded-xl bg-indigo-600 text-white font-bold text-xs">manifest.json</button>
-          <button id="tab-pwa-sw" type="button" onclick="switchPwaCodeTab('sw')" class="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 font-bold text-xs">sw.js</button>
-          <button id="tab-pwa-deploy" type="button" onclick="switchPwaCodeTab('deploy')" class="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 font-bold text-xs">GitHub Deployment Guide</button>
-        </div>
-        <div class="flex items-center gap-1.5">
-          <button type="button" onclick="downloadActivePwaFile()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 font-bold text-xs active:scale-95">
-            💾 Download
-          </button>
-          <button type="button" onclick="copyActivePwaSnippet()" class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs active:scale-95">
-            📋 Copy
-          </button>
-        </div>
-      </div>
-
-      <textarea id="pwa-code-preview" rows="7" readonly class="w-full rounded-2xl bg-slate-950 border border-white/15 p-3 font-mono text-[11px] text-emerald-200 focus:outline-none"></textarea>
-      <div id="pwa-copy-feedback" class="text-xs font-bold text-amber-300 mt-1.5 min-h-[18px]"></div>
-
-      <div class="flex items-center justify-between gap-2 mt-3">
-        <button id="btn-modal-install-now" type="button" onclick="triggerPwaInstall()" class="hidden px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs active:scale-95">
-          📲 Install App Now
-        </button>
-        <button type="button" onclick="closeModal('modal-pwa')" class="ml-auto px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs active:scale-95">
-          Close
-        </button>
-      </div>
+  <div id="meme-reaction-overlay" class="meme-reaction-overlay hidden" aria-live="polite" aria-hidden="true">
+    <video id="meme-reaction-video" muted autoplay loop playsinline>
+      <source id="meme-reaction-source" src="" type="video/mp4" />
+    </video>
+    <div class="meme-reaction-fallback" aria-hidden="true">
+      <span id="meme-reaction-icon">😂</span>
+      <strong id="meme-reaction-title">BATTLE MOMENT</strong>
     </div>
   </div>
 
@@ -1188,7 +938,9 @@ document.addEventListener('pointerdown', () => audio.unlock(), { once: true });
 /* ============================================================================
    2. PERSISTENT DATA, STATS & ACHIEVEMENTS
 ============================================================================ */
-const AVATARS = ['🚀', '👾', '🦊', '🐱', '🐉', '🤖', '🦄', '🐼', '🦁', '🐙', '🧙', '👑'];
+const AVATARS = [
+  '👑','🤴','👸','🧙','🧙‍♀️','🥷','🦸','🦸‍♀️','🧛','🧛‍♀️','🧟','🧞','🧝','🧝‍♀️','🦊','🐺','🐯','🦁','🐻','🐼','🐨','🐵','🦍','🐉','🦄','🐙','🦈','🦅','🦜','🐸','🐱','🐶','🐭','🐰','🦝','🦌','🐯','🐗','🐺','🐮','🐷','🐲','🤖','👾','💀','👻','👽','🎭','🦚','⚔️'
+];
 const AI_PROFILES = [
   { name: 'Vega', avatar: '🤖' },
   { name: 'Orion', avatar: '👾' },
@@ -1198,26 +950,26 @@ const AI_PROFILES = [
 ];
 
 const DEFAULT_DATA = {
-  profile: { name: 'Nova', avatar: '🚀', cardBack: 'prism', bgTheme: 'bg-nebula' },
+  profile: { name: 'King', avatar: '👑', cardBack: 'prism', bgTheme: 'bg-nebula' },
   settings: { muted: false, sfxEnabled: true, musicEnabled: true, sfxVol: 80, musicVol: 35, reduceAnim: false },
   stats: { gamesPlayed: 0, gamesWon: 0, gamesLost: 0, highScore: 0, cardsPlayed: 0, prismCalls: 0, challengesWon: 0, challengesLost: 0, currentStreak: 0, bestStreak: 0 },
   achievements: { firstWin: false, prismMaster: false, bluffBuster: false, highScorer: false, streak3: false, cardShark: false }
 };
 
 const ACHIEVEMENT_DEFS = [
-  { id: 'firstWin', icon: '🏅', title: 'Cosmic Debut', desc: 'Win your first match of PRISM CLASH.' },
-  { id: 'prismMaster', icon: '✦', title: 'Prism Caller', desc: 'Successfully declare PRISM! 5 times.' },
+  { id: 'firstWin', icon: '🏅', title: 'Royal Debut', desc: 'Win your first match of KING BATTLE.' },
+  { id: 'prismMaster', icon: '✦', title: 'King Caller', desc: 'Successfully declare KING! 5 times.' },
   { id: 'bluffBuster', icon: '🔍', title: 'Truth Seeker', desc: 'Win a Wild +4 Challenge against an opponent.' },
   { id: 'highScorer', icon: '💎', title: 'Star Collector', desc: 'Reach 500+ total points in a match.' },
   { id: 'streak3', icon: '🔥', title: 'Supernova Streak', desc: 'Win 3 matches in a row.' },
-  { id: 'cardShark', icon: '🃏', title: 'Prism Veteran', desc: 'Play 100 cards across your career.' }
+  { id: 'cardShark', icon: '🃏', title: 'Kingdom Veteran', desc: 'Play 100 cards across your career.' }
 ];
 
 let userData = loadUserData();
 
 function loadUserData() {
   try {
-    const raw = localStorage.getItem('prism_clash_save_v1');
+    const raw = localStorage.getItem('king_battle_save_v1');
     if (raw) {
       const parsed = JSON.parse(raw);
       return {
@@ -1233,12 +985,12 @@ function loadUserData() {
 
 function saveUserData() {
   try {
-    localStorage.setItem('prism_clash_save_v1', JSON.stringify(userData));
+    localStorage.setItem('king_battle_save_v1', JSON.stringify(userData));
   } catch (e) {}
 }
 
 function applySavedPreferences() {
-  document.body.className = `game-bg ${userData.profile.bgTheme} ${userData.settings.reduceAnim ? 'no-anim' : ''} select-none`;
+  document.body.className = `game-bg ${userData.profile.bgTheme}${userData.settings.reduceAnim ? ' no-anim' : ''}`;
   document.getElementById('menu-player-name').textContent = userData.profile.name;
   document.getElementById('menu-player-avatar').textContent = userData.profile.avatar;
 
@@ -1248,8 +1000,16 @@ function applySavedPreferences() {
   audio.sfxVol = userData.settings.sfxVol / 100;
   audio.musicVol = userData.settings.musicVol / 100;
 
-  document.getElementById('btn-quick-mute').textContent = audio.muted ? '🔇' : '🔊';
-  document.getElementById('btn-game-mute').textContent = audio.muted ? '🔇' : '🔊';
+  const quickMuteBtn = document.getElementById('btn-quick-mute');
+  const gameMuteBtn = document.getElementById('btn-game-mute');
+  if (quickMuteBtn) {
+    quickMuteBtn.textContent = audio.muted ? '🔇' : '🔊';
+    quickMuteBtn.setAttribute('aria-pressed', String(audio.muted));
+  }
+  if (gameMuteBtn) {
+    gameMuteBtn.textContent = audio.muted ? '🔇' : '🔊';
+    gameMuteBtn.setAttribute('aria-pressed', String(audio.muted));
+  }
 
   document.getElementById('set-sfx-enabled').checked = userData.settings.sfxEnabled;
   document.getElementById('set-music-enabled').checked = userData.settings.musicEnabled;
@@ -1277,11 +1037,11 @@ function checkAchievements() {
 ============================================================================ */
 const COLORS = ['red', 'yellow', 'green', 'blue'];
 const COLOR_META = {
-  red: { name: 'CRIMSON', icon: '🔥', cls: 'card-red', orbBg: 'bg-rose-600' },
-  yellow: { name: 'GOLD', icon: '☀️', cls: 'card-yellow', orbBg: 'bg-amber-500' },
-  green: { name: 'EMERALD', icon: '🍃', cls: 'card-green', orbBg: 'bg-emerald-600' },
-  blue: { name: 'COBALT', icon: '🌊', cls: 'card-blue', orbBg: 'bg-blue-600' },
-  wild: { name: 'PRISM', icon: '✦', cls: 'card-wild', orbBg: 'bg-purple-600' }
+  red: { name: 'CRIMSON', icon: '🔥', cls: 'card-red', orbCls: 'orb-red' },
+  yellow: { name: 'GOLD', icon: '☀️', cls: 'card-yellow', orbCls: 'orb-yellow' },
+  green: { name: 'EMERALD', icon: '🍃', cls: 'card-green', orbCls: 'orb-green' },
+  blue: { name: 'COBALT', icon: '🌊', cls: 'card-blue', orbCls: 'orb-blue' },
+  wild: { name: 'PRISM', icon: '✦', cls: 'card-wild', orbCls: 'orb-wild' }
 };
 
 let cardUidCounter = 1;
@@ -1331,30 +1091,44 @@ function getCardCornerBadge(card) {
   return COLOR_META[card.color].icon;
 }
 
-function renderCardHTML(card, extraClasses = '', clickableAttr = '') {
+function getCardAccessibleName(card) {
+  const suit = COLOR_META[card.color].name;
+  if (card.type === 'number') return `${suit} ${card.value}`;
+  if (card.type === 'skip') return `${suit} Skip`;
+  if (card.type === 'reverse') return `${suit} Reverse`;
+  if (card.type === 'draw2') return `${suit} Draw Two`;
+  if (card.type === 'wild') return 'Wild Royal Card';
+  if (card.type === 'wild4') return 'Wild Draw Four Card';
+  return `${suit} Card`;
+}
+
+function renderCardHTML(card, extraClasses = '', clickableAttr = '', isButton = false, ariaLabel = '') {
   const meta = COLOR_META[card.color];
   const sym = getCardDisplaySymbol(card);
   const badge = getCardCornerBadge(card);
-  const textColor = card.color === 'yellow' ? 'text-slate-950' : 'text-white';
-  const centerSize = sym.length > 1 ? 'text-3xl sm:text-4xl' : 'text-4xl sm:text-5xl';
+  const cornerColor = card.color === 'yellow' ? 'text-yellow-dark' : 'text-white-pure';
+  const multiCls = sym.length > 1 ? 'multi-char' : '';
+  const tag = isButton ? 'button' : 'div';
+  const btnAttrs = isButton ? 'type="button"' : 'role="img"';
+  const labelAttr = ariaLabel ? `aria-label="${ariaLabel}"` : `aria-label="${getCardAccessibleName(card)}"`;
 
   return `
-    <div ${clickableAttr} class="prism-card ${meta.cls} ${extraClasses} flex flex-col justify-between p-1.5 sm:p-2 select-none">
-      <div class="card-inner-oval"></div>
-      <div class="relative z-10 flex items-center justify-between leading-none">
-        <span class="font-black text-xs sm:text-sm ${card.color === 'wild' ? 'text-white' : textColor} drop-shadow">${sym}</span>
-        <span class="text-[10px] sm:text-xs">${badge}</span>
-      </div>
-      <div class="relative z-10 my-auto flex flex-col items-center justify-center">
-        <span class="font-black ${centerSize} text-white text-stroke tracking-tighter leading-none">${sym}</span>
-        ${card.type === 'wild4' ? '<span class="text-[9px] font-black uppercase tracking-widest text-amber-300 mt-0.5">WILD</span>' : ''}
-        ${card.type === 'wild' ? '<span class="text-[9px] font-black uppercase tracking-widest text-sky-300 mt-0.5">PRISM</span>' : ''}
-      </div>
-      <div class="relative z-10 flex items-center justify-between leading-none rotate-180">
-        <span class="font-black text-xs sm:text-sm ${card.color === 'wild' ? 'text-white' : textColor} drop-shadow">${sym}</span>
-        <span class="text-[10px] sm:text-xs">${badge}</span>
-      </div>
-    </div>
+    <${tag} ${btnAttrs} ${labelAttr} ${clickableAttr} class="prism-card ${meta.cls} ${extraClasses}">
+      <span class="card-inner-oval" aria-hidden="true"></span>
+      <span class="card-corner" aria-hidden="true">
+        <span class="card-corner-sym ${card.color === 'wild' ? 'text-white-pure' : cornerColor}">${sym}</span>
+        <span class="card-corner-emblem">${badge}</span>
+      </span>
+      <span class="card-center" aria-hidden="true">
+        <span class="card-center-sym ${multiCls}">${sym}</span>
+        ${card.type === 'wild4' ? '<span class="card-wild-sub" style="color: #fcd34d;">WILD</span>' : ''}
+        ${card.type === 'wild' ? '<span class="card-wild-sub" style="color: #7dd3fc;">PRISM</span>' : ''}
+      </span>
+      <span class="card-corner card-corner-bottom" aria-hidden="true">
+        <span class="card-corner-sym ${card.color === 'wild' ? 'text-white-pure' : cornerColor}">${sym}</span>
+        <span class="card-corner-emblem">${badge}</span>
+      </span>
+    </${tag}>
   `;
 }
 
@@ -1437,7 +1211,7 @@ function initMatch(config) {
   stopConfetti();
 
   const players = [];
-  players.push({ id: 0, name: userData.profile.name || 'Player 1', avatar: userData.profile.avatar || '🚀', isHuman: true, hand: [], score: 0, calledPrism: false });
+  players.push({ id: 0, name: userData.profile.name || 'King', avatar: userData.profile.avatar || '👑', isHuman: true, hand: [], score: 0, calledPrism: false });
 
   for (let i = 1; i < config.playerCount; i++) {
     if (config.opponentType === 'local') {
@@ -1659,6 +1433,35 @@ function shakeCardElement(uid) {
   }
 }
 
+function showMemeReaction(card) {
+  if (!card || (card.type !== 'draw2' && card.type !== 'wild4')) return;
+
+  const overlay = document.getElementById('meme-reaction-overlay');
+  const video = document.getElementById('meme-reaction-video');
+  const source = document.getElementById('meme-reaction-source');
+  const title = document.getElementById('meme-reaction-title');
+  const icon = document.getElementById('meme-reaction-icon');
+
+  if (!overlay || !video || !source) return;
+  const reaction = card.type === 'wild4'
+    ? { icon: '😱', title: 'ROYAL +4!', src: 'https://media.w3.org/2010/05/sintel/trailer.mp4' }
+    : { icon: '😂', title: 'DRAW TWO!', src: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4' };
+
+  icon.textContent = reaction.icon;
+  title.textContent = reaction.title;
+  source.src = reaction.src;
+  video.load();
+  overlay.classList.remove('hidden');
+  overlay.setAttribute('aria-hidden', 'false');
+  video.play().catch(() => {});
+
+  clearTimeout(showMemeReaction.timer);
+  showMemeReaction.timer = setTimeout(() => {
+    overlay.classList.add('hidden');
+    overlay.setAttribute('aria-hidden', 'true');
+  }, 2400);
+}
+
 function playCardFromHand(playerIdx, cardIdx, chosenWildColor = null, chosenSwapTarget = null) {
   const gs = gameState;
   gs.inputLocked = true;
@@ -1670,6 +1473,7 @@ function playCardFromHand(playerIdx, cardIdx, chosenWildColor = null, chosenSwap
 
   const [card] = player.hand.splice(cardIdx, 1);
   gs.discard.push(card);
+  showMemeReaction(card);
 
   if (player.hand.length > 1) {
     player.calledPrism = false;
@@ -1678,7 +1482,7 @@ function playCardFromHand(playerIdx, cardIdx, chosenWildColor = null, chosenSwap
     if (Math.random() > forgetChance) {
       player.calledPrism = true;
       audio.play('prism');
-      showFloatingBanner(`${player.name}: PRISM!`, 'from-rose-500 via-amber-400 to-sky-500');
+      showFloatingBanner(`${player.name}: KING!`, 'from-rose-500 via-amber-400 to-sky-500');
     } else {
       player.calledPrism = false;
     }
@@ -1739,8 +1543,11 @@ function openSwapTargetModal(fromIdx) {
   gameState.players.forEach((p, idx) => {
     if (idx === fromIdx) return;
     const btn = document.createElement('button');
-    btn.className = 'w-full p-3 rounded-2xl bg-slate-800 hover:bg-indigo-600 text-white font-bold flex items-center justify-between transition';
-    btn.innerHTML = `<span>${p.avatar} ${p.name}</span><span class="text-xs bg-black/40 px-2.5 py-1 rounded-full">${p.hand.length} cards</span>`;
+    btn.type = 'button';
+    btn.className = 'mode-card-btn';
+    btn.style.justifyContent = 'space-between';
+    btn.style.minHeight = '54px';
+    btn.innerHTML = `<span style="font-weight: 800;">${p.avatar} ${p.name}</span><span class="score-pill">${p.hand.length} cards</span>`;
     btn.onclick = () => {
       closeModal('modal-swap-target');
       const ctx = gameState.pendingSwapContext;
@@ -2170,13 +1977,13 @@ function handleRoundWin(winnerIdx) {
   const board = document.getElementById('end-scoreboard');
   const sorted = [...gs.players].sort((a, b) => b.score - a.score);
   board.innerHTML = sorted.map(p => `
-    <div class="flex items-center justify-between px-3 py-2 rounded-xl ${p.id === winner.id ? 'bg-amber-500/20 border border-amber-400/40' : 'bg-slate-900/60'}">
-      <div class="flex items-center gap-2">
-        <span>${p.avatar}</span>
-        <span class="font-bold text-white">${p.name}</span>
-        <span class="text-[11px] text-slate-400">(${p.hand.length} left)</span>
+    <div class="score-row ${p.id === winner.id ? 'winner' : ''}">
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <span aria-hidden="true">${p.avatar}</span>
+        <span style="font-weight: 800;">${p.name}</span>
+        <span style="font-size: 0.72rem; color: var(--md-sys-color-on-surface-variant);">(${p.hand.length} left)</span>
       </div>
-      <div class="font-black text-amber-300">
+      <div style="font-weight: 800; color: var(--md-sys-color-tertiary); font-family: 'Space Grotesk', sans-serif;">
         ${p.id === winner.id ? `+${roundPoints} → ` : ''}${p.score} pts
       </div>
     </div>
@@ -2208,10 +2015,10 @@ function renderAll() {
   const turnEl = document.getElementById('turn-indicator');
   if (isHumanTurn) {
     turnEl.textContent = gs.hasDrawnThisTurn ? '✨ Play Drawn Card or Pass' : `⚡ ${activePlayer.name}'s Turn — Play or Draw`;
-    turnEl.className = 'mb-2 sm:mb-3 px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-500/30 to-emerald-500/30 border border-amber-300/60 text-xs sm:text-sm font-extrabold text-amber-200 shadow-lg';
+    turnEl.className = 'turn-pill turn-pill-human';
   } else {
     turnEl.textContent = `⏳ ${activePlayer.avatar} ${activePlayer.name} is thinking...`;
-    turnEl.className = 'mb-2 sm:mb-3 px-4 py-1.5 rounded-full glass-panel text-xs sm:text-sm font-bold text-slate-200 shadow-lg';
+    turnEl.className = 'turn-pill turn-pill-ai';
   }
 
   const dirRing = document.getElementById('direction-ring');
@@ -2227,7 +2034,7 @@ function renderAll() {
   }
 
   document.getElementById('draw-pile-count').textContent = gs.deck.length;
-  document.getElementById('draw-pile-visual').className = `w-20 h-28 sm:w-24 sm:h-36 rounded-2xl card-back card-back-${userData.profile.cardBack} flex flex-col items-center justify-center relative`;
+  document.getElementById('draw-pile-visual').className = `pile-slot prism-card card-back card-back-${userData.profile.cardBack}`;
 
   const humanHasPlayable = gs.players[viewIdx].hand.some(c => isCardPlayable(c, viewIdx));
   const drawGlow = document.getElementById('draw-pile-glow');
@@ -2236,7 +2043,8 @@ function renderAll() {
 
   const cMeta = COLOR_META[gs.activeColor];
   const orb = document.getElementById('active-color-orb');
-  orb.className = `w-12 h-12 sm:w-14 sm:h-14 rounded-2xl border-2 border-white shadow-lg flex flex-col items-center justify-center transition-all duration-300 ${cMeta.orbBg}`;
+  orb.className = `color-orb ${cMeta.orbCls}`;
+  orb.setAttribute('aria-label', `Active suit: ${cMeta.name}`);
   document.getElementById('active-color-icon').textContent = cMeta.icon;
   document.getElementById('active-color-label').textContent = cMeta.name;
 
@@ -2249,49 +2057,56 @@ function renderAll() {
   }
 
   const topCard = getTopDiscard();
-  document.getElementById('discard-pile-slot').innerHTML = topCard ? renderCardHTML(topCard, 'w-20 h-28 sm:w-24 sm:h-36 pointer-events-none') : '';
+  document.getElementById('discard-pile-slot').innerHTML = topCard
+    ? renderCardHTML(topCard, 'pile-card-size', '', false, `Top discard card: ${getCardAccessibleName(topCard)}`)
+    : '';
 
   const oppContainer = document.getElementById('opponents-container');
-  oppContainer.innerHTML = gs.players.map((p, idx) => {
+  oppContainer.innerHTML = `<div class="opponents-track-inner">${gs.players.map((p, idx) => {
     if (idx === viewIdx) return '';
     const isTurn = gs.currentPlayer === idx;
     const isPrismAlert = p.hand.length === 1;
     const miniBacks = Array.from({ length: Math.min(p.hand.length, 7) })
-      .map(() => `<span class="inline-block w-2.5 h-4 rounded-[3px] card-back card-back-${userData.profile.cardBack} -ml-1 first:ml-0"></span>`)
+      .map(() => `<span class="opp-mini-card card-back card-back-${userData.profile.cardBack}" aria-hidden="true"></span>`)
       .join('');
 
     return `
-      <div class="glass-panel px-3 py-2 rounded-2xl flex items-center gap-2.5 transition-all ${isTurn ? 'ring-2 ring-amber-400 bg-indigo-950/75 scale-105' : 'opacity-85'}">
-        <div class="relative text-2xl">
+      <div class="opp-card ${isTurn ? 'active-turn' : ''}" data-opp-active="${isTurn ? 'true' : 'false'}" aria-label="${p.name}, ${p.hand.length} cards, ${p.score} points${isTurn ? ', current turn' : ''}">
+        <div class="opp-avatar-wrap human-avatar human-avatar-sm" aria-hidden="true">
           ${p.avatar}
-          ${isPrismAlert ? `<span class="absolute -top-2 -right-2 px-1.5 py-0.2 rounded-full text-[9px] font-black ${p.calledPrism ? 'bg-emerald-500 text-slate-950' : 'bg-rose-500 text-white animate-ping'}">${p.calledPrism ? 'PRISM' : '!'}</span>` : ''}
+          ${isPrismAlert ? `<span class="opp-prism-alert ${p.calledPrism ? 'opp-prism-called' : 'opp-prism-forgot'}">${p.calledPrism ? 'KING' : '!'}</span>` : ''}
         </div>
         <div>
-          <div class="flex items-center gap-1.5">
-            <span class="text-xs font-extrabold text-white">${p.name}</span>
-            <span class="text-[10px] font-bold text-amber-300">${p.score}p</span>
+          <div style="display: flex; align-items: center; gap: 0.4rem;">
+            <span style="font-size: 0.78rem; font-weight: 800;">${p.name}</span>
+            <span style="font-size: 0.68rem; font-weight: 700; color: var(--md-sys-color-tertiary);">${p.score}p</span>
           </div>
-          <div class="flex items-center gap-1.5 mt-0.5">
-            <div class="flex items-center pl-1">${miniBacks}</div>
-            <span class="text-[11px] font-black text-slate-200">${p.hand.length}</span>
+          <div style="display: flex; align-items: center; gap: 0.4rem; margin-top: 2px;">
+            <div class="opp-mini-fan">${miniBacks}</div>
+            <span style="font-size: 0.74rem; font-weight: 800; color: var(--md-sys-color-on-surface-variant);">${p.hand.length}</span>
           </div>
         </div>
       </div>
     `;
-  }).join('');
+  }).join('')}</div>`;
+
+  const activeOppEl = oppContainer.querySelector('[data-opp-active="true"]');
+  if (activeOppEl && typeof activeOppEl.scrollIntoView === 'function') {
+    activeOppEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }
 
   const human = gs.players[viewIdx];
   document.getElementById('human-avatar-hud').textContent = human.avatar;
   document.getElementById('human-name-hud').textContent = human.name;
   document.getElementById('human-score-hud').textContent = `${human.score} pts`;
-  document.getElementById('human-card-count-hud').textContent = `${human.hand.length} card${human.hand.length === 1 ? '' : 's'}${human.calledPrism ? ' • ✦ PRISM CALLED' : ''}`;
+  document.getElementById('human-card-count-hud').textContent = `${human.hand.length} card${human.hand.length === 1 ? '' : 's'}${human.calledPrism ? ' • 👑 KING CALLED' : ''}`;
 
   const prismBtn = document.getElementById('btn-declare-prism');
   if (human.hand.length <= 2 && !human.calledPrism) {
-    prismBtn.classList.remove('opacity-60');
+    prismBtn.classList.remove('btn-prism-idle');
     prismBtn.classList.add('prism-btn-pulse');
   } else {
-    prismBtn.classList.add('opacity-60');
+    prismBtn.classList.add('btn-prism-idle');
     prismBtn.classList.remove('prism-btn-pulse');
   }
 
@@ -2301,13 +2116,14 @@ function renderAll() {
   else catchBtn.classList.add('hidden');
 
   const handContainer = document.getElementById('human-hand-cards');
-  const overlapClass = human.hand.length > 10 ? '-ml-7 sm:-ml-8' : human.hand.length > 7 ? '-ml-5 sm:-ml-6' : '-ml-2 sm:-ml-3';
+  const overlapClass = human.hand.length > 10 ? 'overlap-lg' : human.hand.length > 7 ? 'overlap-md' : 'overlap-sm';
 
   handContainer.innerHTML = human.hand.map((card, i) => {
     const playable = (isHumanTurn && isCardPlayable(card, viewIdx)) || (!isHumanTurn && gs.config.opponentType === 'ai' && canJumpIn(card));
     const stateCls = playable ? 'playable' : 'unplayable';
     const marginCls = i === 0 ? '' : overlapClass;
-    return renderCardHTML(card, `hand-card ${stateCls} ${marginCls}`, `data-card-uid="${card.uid}" onclick="handleHumanCardClick(${card.uid})"`);
+    const cardLabel = `${getCardAccessibleName(card)}, ${playable ? 'playable' : 'not playable'}`;
+    return renderCardHTML(card, `hand-card ${stateCls} ${marginCls}`, `data-card-uid="${card.uid}" onclick="handleHumanCardClick(${card.uid})"`, true, cardLabel);
   }).join('');
 }
 
@@ -2324,13 +2140,20 @@ function updateHUDLabels() {
   if (gs.config.houseRules.jumpIn) activeHR.push('Jump-In');
   if (gs.config.houseRules.drawUntil) activeHR.push('Draw-Until');
 
-  hrDiv.innerHTML = activeHR.map(r => `<span class="px-2 py-0.5 rounded-full bg-indigo-500/25 border border-indigo-400/40 text-[10px] font-bold text-indigo-200">${r}</span>`).join('');
+  hrDiv.innerHTML = activeHR.map(r => `<span class="hr-chip">${r}</span>`).join('');
 }
 
-function showFloatingBanner(text, gradientCls = 'from-indigo-500 to-purple-600') {
+function showFloatingBanner(text, gradientCls = '') {
   const container = document.getElementById('floating-banner-container');
+  let variant = 'banner-indigo';
+  if (gradientCls.includes('emerald')) variant = 'banner-emerald';
+  else if (gradientCls.includes('via-amber')) variant = 'banner-prism';
+  else if (gradientCls.includes('purple')) variant = 'banner-purple';
+  else if (gradientCls.includes('sky')) variant = 'banner-sky';
+  else if (gradientCls.includes('rose') || gradientCls.includes('amber')) variant = 'banner-danger';
+
   const el = document.createElement('div');
-  el.className = `action-banner fixed left-1/2 top-1/2 px-6 py-3 rounded-2xl bg-gradient-to-r ${gradientCls} text-white font-black text-lg sm:text-2xl tracking-wide shadow-2xl border-2 border-white/80 whitespace-nowrap`;
+  el.className = `action-banner ${variant}`;
   el.textContent = text;
   container.appendChild(el);
   setTimeout(() => el.remove(), 1400);
@@ -2394,7 +2217,6 @@ function returnToMenu() {
   stopConfetti();
   document.querySelectorAll('[id^="modal-"]').forEach(m => {
     m.classList.add('hidden');
-    m.classList.remove('flex');
   });
   gameState = null;
   showScreen('screen-menu');
@@ -2403,26 +2225,35 @@ function returnToMenu() {
 function showScreen(id) {
   document.getElementById('screen-menu').classList.add('hidden');
   document.getElementById('screen-game').classList.add('hidden');
-  document.getElementById('screen-game').classList.remove('flex');
-
-  const target = document.getElementById(id);
-  target.classList.remove('hidden');
-  if (id === 'screen-game') target.classList.add('flex');
+  document.getElementById(id).classList.remove('hidden');
 }
 
 function openModal(id) {
   audio.play('click');
   if (id === 'modal-profile') populateProfileModal();
   const el = document.getElementById(id);
+  if (!el) return;
   el.classList.remove('hidden');
-  el.classList.add('flex');
 }
 
 function closeModal(id) {
   const el = document.getElementById(id);
+  if (!el) return;
   el.classList.add('hidden');
-  el.classList.remove('flex');
+  if (id === 'modal-pause' && gameState && gameState.paused) {
+    gameState.paused = false;
+    const curr = gameState.players[gameState.currentPlayer];
+    if (!curr.isHuman) aiTimeout = setTimeout(() => executeAITurn(), 500);
+  }
 }
+
+// Allow backdrop click to close dismissible Material 3 dialogs
+document.addEventListener('click', (e) => {
+  const backdrop = e.target.closest('.m3-modal-backdrop[data-dismissible="true"]');
+  if (backdrop && e.target === backdrop) {
+    closeModal(backdrop.id);
+  }
+});
 
 /* ============================================================================
    10. SETTINGS & PROFILE HANDLERS
@@ -2476,7 +2307,7 @@ function populateProfileModal() {
   tempBgTheme = userData.profile.bgTheme;
 
   document.getElementById('prof-avatar-grid').innerHTML = AVATARS.map(av => `
-    <button type="button" onclick="selectAvatar('${av}')" class="av-opt p-2 rounded-xl text-2xl border ${av === tempAvatar ? 'border-amber-400 bg-indigo-600/40' : 'border-white/10 bg-slate-900'}">
+    <button type="button" onclick="selectAvatar('${av}')" aria-label="Select avatar ${av}" aria-pressed="${av === tempAvatar}" class="choice-pill ${av === tempAvatar ? 'selected' : ''}" style="font-size: 1.45rem;">
       ${av}
     </button>
   `).join('');
@@ -2503,18 +2334,20 @@ function selectBgTheme(bg) {
 
 function highlightProfilePills() {
   document.querySelectorAll('.cb-opt').forEach(b => {
-    b.classList.toggle('border-amber-400', b.dataset.cb === tempCardBack);
-    b.classList.toggle('bg-indigo-600/40', b.dataset.cb === tempCardBack);
+    const active = b.dataset.cb === tempCardBack;
+    b.classList.toggle('selected', active);
+    b.setAttribute('aria-pressed', String(active));
   });
   document.querySelectorAll('.bg-opt').forEach(b => {
-    b.classList.toggle('border-amber-400', b.dataset.bg === tempBgTheme);
-    b.classList.toggle('bg-indigo-600/40', b.dataset.bg === tempBgTheme);
+    const active = b.dataset.bg === tempBgTheme;
+    b.classList.toggle('selected', active);
+    b.setAttribute('aria-pressed', String(active));
   });
 }
 
 function saveProfile() {
   const rawName = document.getElementById('prof-name-input').value.trim();
-  userData.profile.name = rawName || 'Nova';
+  userData.profile.name = rawName || 'King';
   userData.profile.avatar = tempAvatar;
   userData.profile.cardBack = tempCardBack;
   userData.profile.bgTheme = tempBgTheme;
@@ -2542,22 +2375,22 @@ function openStatsModal() {
   ];
 
   document.getElementById('stats-grid').innerHTML = statItems.map(item => `
-    <div class="bg-slate-900/80 border border-white/10 rounded-2xl p-2.5 text-center">
-      <div class="text-lg sm:text-xl font-black text-white">${item.val}</div>
-      <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">${item.label}</div>
+    <div class="stat-card">
+      <div class="stat-val">${item.val}</div>
+      <div class="stat-lbl">${item.label}</div>
     </div>
   `).join('');
 
   document.getElementById('achievements-list').innerHTML = ACHIEVEMENT_DEFS.map(ach => {
     const unlocked = userData.achievements[ach.id];
     return `
-      <div class="flex items-center gap-3 p-3 rounded-2xl border ${unlocked ? 'bg-amber-500/15 border-amber-400/50' : 'bg-slate-900/60 border-white/10 opacity-55'}">
-        <span class="text-2xl">${unlocked ? ach.icon : '🔒'}</span>
-        <div class="flex-1">
-          <div class="text-xs sm:text-sm font-extrabold text-white">${ach.title}</div>
-          <div class="text-[11px] text-slate-300">${ach.desc}</div>
+      <div class="ach-card ${unlocked ? 'unlocked' : 'locked'}">
+        <span style="font-size: 1.55rem;" aria-hidden="true">${unlocked ? ach.icon : '🔒'}</span>
+        <div style="flex: 1; min-width: 0;">
+          <div style="font-size: 0.88rem; font-weight: 800;">${ach.title}</div>
+          <div style="font-size: 0.76rem; color: var(--md-sys-color-on-surface-variant);">${ach.desc}</div>
         </div>
-        <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${unlocked ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-400'}">
+        <span class="score-pill" style="${unlocked ? 'background: rgba(109,213,140,0.22); color: #6dd58c;' : 'background: rgba(255,255,255,0.08); color: var(--md-sys-color-on-surface-variant);'}">
           ${unlocked ? 'Unlocked' : 'Locked'}
         </span>
       </div>
@@ -2571,10 +2404,31 @@ function openStatsModal() {
    11. KEYBOARD & CONFETTI
 ============================================================================ */
 document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const openDismissible = Array.from(document.querySelectorAll('.m3-modal-backdrop[data-dismissible="true"]:not(.hidden)')).pop();
+    if (openDismissible) {
+      e.preventDefault();
+      closeModal(openDismissible.id);
+      return;
+    }
+    if (gameState && !gameState.privacyCurtainActive) {
+      const anyMandatoryOpen = document.querySelector('.m3-modal-backdrop:not(.hidden)');
+      if (!anyMandatoryOpen) {
+        e.preventDefault();
+        pauseGame();
+      }
+    }
+    return;
+  }
+
+  const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+  if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+  if (document.querySelector('.m3-modal-backdrop:not(.hidden)')) return;
+
   if (!gameState || gameState.paused || gameState.privacyCurtainActive) return;
   const key = e.key.toLowerCase();
   if (key === 'd') humanDrawCard();
-  else if (key === 'u' || key === 'p') declarePrism();
+  else if (key === 'u' || key === 'k') declarePrism();
   else if (key >= '1' && key <= '9') {
     const idx = parseInt(key, 10) - 1;
     const viewIdx = getViewingHumanIndex();
@@ -2645,323 +2499,148 @@ window.addEventListener('resize', () => {
 });
 
 /* ============================================================================
-   12. GITHUB PAGES PWA ENGINE, SW REGISTRATION & INSTALLATION HANDLERS
+   12. PROGRESSIVE WEB APP (PWA) LIFECYCLE, OFFLINE & INSTALL ENGINE
 ============================================================================ */
 let deferredInstallPrompt = null;
+let waitingServiceWorker = null;
 let pwaStatusInfo = {
   isStandalone: false,
   isSecureContextLike: false,
   swRegistered: false,
-  swMessage: 'Pending window load'
+  swMessage: 'Initializing...'
 };
 let activePwaTab = 'manifest';
+
+function isIosDevice() {
+  const ua = window.navigator.userAgent || '';
+  return /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
 
 function buildStandardManifestObject() {
   return {
     id: './',
-    name: 'PRISM CLASH',
-    short_name: 'Prism Clash',
-    description: 'Cosmic Tactical Card Arena',
+    name: 'KING BATTLE — Royal Card Arena',
+    short_name: 'King Battle',
+    description: 'Cosmic tactical 108-card shedding game with AI opponents, custom house rules, pass-and-play, and full offline play.',
     start_url: './',
     scope: './',
     display: 'standalone',
-    orientation: 'portrait',
-    background_color: '#070913',
-    theme_color: '#0b0e1c',
-    categories: ['games', 'card'],
+    display_override: ['standalone', 'minimal-ui'],
+    orientation: 'any',
+    background_color: '#0b0f19',
+    theme_color: '#111625',
+    categories: ['games', 'card', 'entertainment'],
     icons: [
-      {
-        src: './icons/icon-192.png',
-        sizes: '192x192',
-        type: 'image/png',
-        purpose: 'any'
-      },
-      {
-        src: './icons/icon-512.png',
-        sizes: '512x512',
-        type: 'image/png',
-        purpose: 'any'
-      },
-      {
-        src: './icons/icon-512.png',
-        sizes: '512x512',
-        type: 'image/png',
-        purpose: 'maskable'
-      }
+      { src: './icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+      { src: './icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+      { src: './icons/icon-maskable-192.png', sizes: '192x192', type: 'image/png', purpose: 'maskable' },
+      { src: './icons/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+      { src: './icons/favicon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' }
     ]
   };
 }
 
 function getStandaloneServiceWorkerSource() {
-  return `const CACHE_NAME = "prism-clash-v1";
-
-const ASSETS = [
+  return `// ./sw.js — Production Offline-First Service Worker
+const CACHE_VERSION = "prism-clash-v2";
+const SHELL_CACHE = \`\${CACHE_VERSION}-shell\`;
+const APP_SHELL_ASSETS = [
   "./",
   "./index.html",
+  "./styles.css",
   "./manifest.json",
-  "./sw.js",
+  "./icons/favicon.svg",
+  "./icons/favicon-32.png",
+  "./icons/apple-touch-icon.png",
   "./icons/icon-192.png",
-  "./icons/icon-512.png"
-];
-
-self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)).catch(() => {})
-  );
-  self.skipWaiting();
-});
-
-self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
-        keys
-          .filter((key) => key !== CACHE_NAME)
-          .map((key) => caches.delete(key))
-      )
-    )
-  );
-  self.clients.claim();
-});
-
-self.addEventListener("fetch", (event) => {
-  if (event.request.method !== "GET") return;
-
-  event.respondWith(
-    fetch(event.request)
-      .then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200) {
-          const clone = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone)).catch(() => {});
-        }
-        return networkResponse;
-      })
-      .catch(() => caches.match(event.request).then((cached) => cached || caches.match("./index.html")))
-  );
-});`;
+  "./icons/icon-512.png",
+  "./icons/icon-maskable-192.png",
+  "./icons/icon-maskable-512.png"
+];`;
 }
 
 function getDeployAndApkGuideText() {
-  return `# Deploying PRISM CLASH on GitHub Pages
+  return `# Installing & Deploying KING BATTLE
 
-1. Folder Layout in your GitHub Repository:
-   prism-clash/ (or root of repository)
-   ├── index.html
-   ├── manifest.json
-   ├── sw.js
-   └── icons/
-       ├── icon-192.png
-       └── icon-512.png
+1. Desktop Chrome / Edge:
+   - Click the "Install App" button in the top bar (or the install icon in the browser address bar).
+   - King Battle launches in its own standalone window and works 100% offline.
 
-2. Configure GitHub Pages:
-   - Go to your repository on GitHub.
-   - Click Settings -> Pages.
-   - Under 'Build and deployment', choose 'Deploy from a branch'.
-   - Select 'main' (or 'master') branch and '/' root folder, then click Save.
-   - Your PWA will be published at https://<username>.github.io/<repo-name>/
+2. Android (Chrome):
+   - Tap "Install App" or open Chrome Menu (⋮) -> "Install app".
+   - Long-press the home-screen icon for quick shortcuts (Quick Play, Blitz 1v1, Hard AI).
 
-3. Install in Chrome on Phone:
-   - Open https://<username>.github.io/<repo-name>/ in Mobile Chrome.
-   - Tap the 'Install App' button or Chrome menu (⋮) -> 'Install app' / 'Add to Home screen'.`;
-}
+3. iPhone / iPad (Safari):
+   - Tap the Share button (⬆️) in Safari -> "Add to Home Screen".
 
-function renderPrismAppIconCanvas(size, maskable = false) {
-  const canvas = document.createElement('canvas');
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return null;
-
-  const pad = maskable ? size * 0.14 : size * 0.05;
-  const radius = size * (maskable ? 0.22 : 0.24);
-  const w = size - pad * 2;
-  const h = size - pad * 2;
-
-  ctx.fillStyle = '#070913';
-  ctx.fillRect(0, 0, size, size);
-
-  const bgGrad = ctx.createLinearGradient(0, 0, size, size);
-  bgGrad.addColorStop(0, '#1e1b4b');
-  bgGrad.addColorStop(0.5, '#0f172a');
-  bgGrad.addColorStop(1, '#070913');
-  ctx.fillStyle = bgGrad;
-  ctx.beginPath();
-  ctx.roundRect(pad, pad, w, h, radius);
-  ctx.fill();
-
-  const prismGrad = ctx.createLinearGradient(pad, pad, size - pad, size - pad);
-  prismGrad.addColorStop(0, '#ff3b5c');
-  prismGrad.addColorStop(0.35, '#fbbf24');
-  prismGrad.addColorStop(0.7, '#10b981');
-  prismGrad.addColorStop(1, '#3b82f6');
-
-  ctx.lineWidth = Math.max(4, size * 0.025);
-  ctx.strokeStyle = prismGrad;
-  ctx.beginPath();
-  ctx.roundRect(pad + ctx.lineWidth * 0.5, pad + ctx.lineWidth * 0.5, w - ctx.lineWidth, h - ctx.lineWidth, radius);
-  ctx.stroke();
-
-  const cx = size / 2;
-  const cy = size / 2;
-  const r = w * 0.31;
-
-  ctx.fillStyle = prismGrad;
-  ctx.beginPath();
-  ctx.moveTo(cx, cy - r);
-  ctx.lineTo(cx + r, cy);
-  ctx.lineTo(cx, cy + r);
-  ctx.lineTo(cx - r, cy);
-  ctx.closePath();
-  ctx.fill();
-
-  const starR = r * 0.44;
-  ctx.fillStyle = '#ffffff';
-  ctx.beginPath();
-  for (let i = 0; i < 8; i++) {
-    const rad = i % 2 === 0 ? starR : starR * 0.36;
-    const angle = (i * Math.PI) / 4 - Math.PI / 2;
-    const sx = cx + Math.cos(angle) * rad;
-    const sy = cy + Math.sin(angle) * rad;
-    if (i === 0) ctx.moveTo(sx, sy);
-    else ctx.lineTo(sx, sy);
-  }
-  ctx.closePath();
-  ctx.fill();
-
-  return canvas;
-}
-
-function downloadTextAsset(filename, content, mimeType) {
-  try {
-    const blob = new Blob([content], { type: mimeType });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1500);
-    return true;
-  } catch (err) {
-    return false;
-  }
-}
-
-function downloadPngIconAsset(size, filename, maskable) {
-  audio.play('click');
-  const canvas = renderPrismAppIconCanvas(size, maskable);
-  const feedback = document.getElementById('pwa-copy-feedback');
-  if (!canvas || typeof canvas.toBlob !== 'function') {
-    if (feedback) feedback.textContent = `Could not generate ${filename} in this browser.`;
-    return;
-  }
-  canvas.toBlob((blob) => {
-    if (!blob) return;
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1500);
-    if (feedback) feedback.textContent = `Downloaded ${filename} (${size}x${size}) — place inside ./icons/.`;
-  }, 'image/png');
-}
-
-function downloadPwaFileByName(kind) {
-  audio.play('click');
-  const feedback = document.getElementById('pwa-copy-feedback');
-  if (kind === 'manifest') {
-    const ok = downloadTextAsset('manifest.json', JSON.stringify(buildStandardManifestObject(), null, 2), 'application/manifest+json');
-    if (feedback) feedback.textContent = ok ? 'Downloaded manifest.json — place in repository root.' : 'Copy manifest.json from preview box.';
-  } else if (kind === 'sw') {
-    const ok = downloadTextAsset('sw.js', getStandaloneServiceWorkerSource(), 'application/javascript');
-    if (feedback) feedback.textContent = ok ? 'Downloaded sw.js — place in repository root.' : 'Copy sw.js from preview box.';
-  }
-}
-
-function downloadAllPwaFiles() {
-  audio.play('start');
-  downloadTextAsset('manifest.json', JSON.stringify(buildStandardManifestObject(), null, 2), 'application/manifest+json');
-  setTimeout(() => { downloadTextAsset('sw.js', getStandaloneServiceWorkerSource(), 'application/javascript'); }, 180);
-  setTimeout(() => { downloadPngIconAsset(192, 'icon-192.png', false); }, 360);
-  setTimeout(() => {
-    downloadPngIconAsset(512, 'icon-512.png', true);
-    const feedback = document.getElementById('pwa-copy-feedback');
-    if (feedback) feedback.textContent = 'Downloaded manifest.json, sw.js, icon-192.png, and icon-512.png.';
-  }, 540);
-}
-
-function downloadActivePwaFile() {
-  audio.play('click');
-  const feedback = document.getElementById('pwa-copy-feedback');
-  if (activePwaTab === 'deploy') {
-    const ok = downloadTextAsset('GITHUB-PWA-GUIDE.txt', getDeployAndApkGuideText(), 'text/plain');
-    if (feedback) feedback.textContent = ok ? 'Downloaded GITHUB-PWA-GUIDE.txt.' : 'Copy guide above.';
-    return;
-  }
-  const isManifest = activePwaTab === 'manifest';
-  const filename = isManifest ? 'manifest.json' : 'sw.js';
-  const content = isManifest ? JSON.stringify(buildStandardManifestObject(), null, 2) : getStandaloneServiceWorkerSource();
-  const mime = isManifest ? 'application/manifest+json' : 'application/javascript';
-  const ok = downloadTextAsset(filename, content, mime);
-  if (feedback) feedback.textContent = ok ? `Downloaded ${filename}.` : `Copy ${filename} above.`;
+4. Hosting (GitHub Pages / Static HTTPS):
+   - All PWA files (manifest.json, sw.js, styles.css, and icons/*) are pre-built in this folder with relative paths so subpath deployments work automatically.`;
 }
 
 function detectCurrentOriginCategory() {
   const proto = window.location.protocol;
   const host = (window.location.hostname || '').toLowerCase();
-  const fullHref = window.location.href.toLowerCase();
 
   if (proto === 'file:') {
     return {
       type: 'Local File (file://)',
-      badge: '⚠️ Local File Origin (file://)',
-      boxCls: 'bg-amber-500/15 border-amber-400/45 text-amber-100',
-      badgeCls: 'text-amber-300',
-      explanation: 'file:// protocol blocks Service Worker registration and Chrome PWA installation. Upload your files to GitHub Pages over HTTPS.'
+      badge: '⚠️ Local File Protocol Detected',
+      calloutCls: 'pwa-callout pwa-callout-warn',
+      explanation: 'Browsers block Service Workers on file:// URLs. Serve this folder via a local HTTP server (e.g. npx serve or python -m http.server) or HTTPS / GitHub Pages to enable offline caching and PWA install.'
     };
   }
 
   if (host.includes('github.io')) {
     return {
-      type: 'GitHub Pages Origin',
-      badge: '✅ GitHub Pages Live Origin Detected',
-      boxCls: 'bg-emerald-500/15 border-emerald-400/45 text-emerald-100',
-      badgeCls: 'text-emerald-300',
-      explanation: 'Your game is hosted on GitHub Pages over HTTPS with relative path support. Service Worker and Chrome PWA install are fully enabled.'
+      type: 'GitHub Pages HTTPS',
+      badge: '✅ GitHub Pages PWA Active',
+      calloutCls: 'pwa-callout pwa-callout-ok',
+      explanation: 'Hosted over HTTPS with relative manifest and Service Worker paths. Full offline play and app installation are enabled.'
     };
   }
 
   if (host === 'localhost' || host === '127.0.0.1' || host === '[::1]') {
     return {
-      type: 'Localhost Development Origin',
-      badge: '🧪 Localhost Origin Ready',
-      boxCls: 'bg-sky-500/15 border-sky-400/45 text-sky-100',
-      badgeCls: 'text-sky-300',
-      explanation: 'Localhost allows testing PWA Service Worker behavior. Push to GitHub Pages for production access on mobile.'
+      type: 'Localhost Server',
+      badge: '✅ Localhost PWA Ready',
+      calloutCls: 'pwa-callout pwa-callout-ok',
+      explanation: 'Running on localhost secure context. Service Worker offline caching and Chrome PWA installation are active.'
     };
   }
 
   if (proto === 'https:') {
     return {
       type: 'HTTPS Web Origin',
-      badge: '✅ HTTPS Origin Detected',
-      boxCls: 'bg-emerald-500/15 border-emerald-400/45 text-emerald-100',
-      badgeCls: 'text-emerald-300',
-      explanation: 'Served over HTTPS on an independent origin. Ensure manifest.json, sw.js, and icons/ are in place.'
+      badge: '✅ Secure HTTPS PWA Ready',
+      calloutCls: 'pwa-callout pwa-callout-ok',
+      explanation: isIosDevice()
+        ? 'On iPhone/iPad Safari, tap Share (⬆️) -> "Add to Home Screen" to install Prism Clash as a full-screen offline app.'
+        : 'Served over HTTPS. Service Worker caching and standalone app installation are enabled.'
     };
   }
 
   return {
     type: `${proto} Origin`,
     badge: '🌐 Web Origin',
-    boxCls: 'bg-slate-800/80 border-white/15 text-slate-200',
-    badgeCls: 'text-indigo-300',
-    explanation: 'Deploy the repository files to GitHub Pages for full PWA installation support.'
+    calloutCls: 'pwa-callout pwa-callout-info',
+    explanation: 'Serve over HTTPS or localhost to enable Service Worker offline caching and standalone PWA installation.'
   };
+}
+
+function updateNetworkBadge() {
+  const pill = document.getElementById('network-status-pill');
+  if (!pill) return;
+  if (!navigator.onLine) {
+    pill.textContent = '📴 Offline Mode';
+    pill.classList.add('offline');
+    pill.classList.remove('hidden');
+  } else if (pwaStatusInfo.isStandalone) {
+    pill.textContent = '⚡ App Mode';
+    pill.classList.remove('offline');
+    pill.classList.remove('hidden');
+  } else {
+    pill.classList.add('hidden');
+  }
 }
 
 function refreshPwaEnvironmentState() {
@@ -2972,17 +2651,19 @@ function refreshPwaEnvironmentState() {
 
   if (!isHttp) {
     pwaStatusInfo.swRegistered = false;
-    pwaStatusInfo.swMessage = `Unavailable on ${proto}`;
+    pwaStatusInfo.swMessage = `Blocked on ${proto}`;
   } else if (!('serviceWorker' in navigator)) {
     pwaStatusInfo.swRegistered = false;
-    pwaStatusInfo.swMessage = 'Service Worker unsupported in this browser';
+    pwaStatusInfo.swMessage = 'Unsupported in browser';
   }
+  updateNetworkBadge();
   updatePwaUI();
 }
 
 function updatePwaUI() {
   const installHeaderBtn = document.getElementById('btn-install-app');
   const installModalBtn = document.getElementById('btn-modal-install-now');
+  const bannerBtn = document.getElementById('btn-banner-install');
   const statusIcon = document.getElementById('pwa-status-icon');
   const statusTitle = document.getElementById('pwa-status-title');
   const statusSub = document.getElementById('pwa-status-sub');
@@ -2996,29 +2677,35 @@ function updatePwaUI() {
   if (pwaStatusInfo.isStandalone) {
     if (statusIcon) statusIcon.textContent = '✅';
     if (statusTitle) statusTitle.textContent = 'Installed PWA App';
-    if (statusSub) statusSub.textContent = 'Running standalone • Offline ready';
+    if (statusSub) statusSub.textContent = 'Standalone mode • Works 100% offline';
+    if (bannerBtn) bannerBtn.textContent = 'Status';
   } else if (canPromptInstall) {
     if (statusIcon) statusIcon.textContent = '📲';
-    if (statusTitle) statusTitle.textContent = 'Ready to Install in Chrome';
-    if (statusSub) statusSub.textContent = 'Tap Install App to add PRISM CLASH';
+    if (statusTitle) statusTitle.textContent = 'Install Prism Clash App';
+    if (statusSub) statusSub.textContent = 'Add to home screen / desktop for offline play';
+    if (bannerBtn) bannerBtn.textContent = 'Install';
+  } else if (isIosDevice() && pwaStatusInfo.swRegistered) {
+    if (statusIcon) statusIcon.textContent = '🍎';
+    if (statusTitle) statusTitle.textContent = 'Install on iOS / iPadOS';
+    if (statusSub) statusSub.textContent = 'Tap Share -> Add to Home Screen';
+    if (bannerBtn) bannerBtn.textContent = 'How To';
   } else if (pwaStatusInfo.swRegistered) {
     if (statusIcon) statusIcon.textContent = '🛡️';
-    if (statusTitle) statusTitle.textContent = 'Service Worker Registered (./sw.js)';
-    if (statusSub) statusSub.textContent = 'Relative paths configured for GitHub Pages';
+    if (statusTitle) statusTitle.textContent = 'Offline PWA Ready';
+    if (statusSub) statusSub.textContent = 'Service Worker active • Cached for offline play';
+    if (bannerBtn) bannerBtn.textContent = 'PWA Info';
   } else {
     if (statusIcon) statusIcon.textContent = '🌐';
     if (statusTitle) statusTitle.textContent = originInfo.type;
-    if (statusSub) statusSub.textContent = 'Tap PWA Studio for GitHub Pages files';
+    if (statusSub) statusSub.textContent = 'Tap for PWA & offline diagnostics';
+    if (bannerBtn) bannerBtn.textContent = 'PWA Info';
   }
 
   const calloutEl = document.getElementById('pwa-origin-callout');
   const badgeEl = document.getElementById('pwa-origin-badge');
   const explEl = document.getElementById('pwa-origin-explanation');
-  if (calloutEl) calloutEl.className = `p-3.5 rounded-2xl border mb-4 text-xs leading-relaxed ${originInfo.boxCls}`;
-  if (badgeEl) {
-    badgeEl.textContent = originInfo.badge;
-    badgeEl.className = `font-black uppercase tracking-wider mb-1 ${originInfo.badgeCls}`;
-  }
+  if (calloutEl) calloutEl.className = originInfo.calloutCls;
+  if (badgeEl) badgeEl.textContent = originInfo.badge;
   if (explEl) explEl.textContent = originInfo.explanation;
 
   const diagProto = document.getElementById('pwa-diag-protocol');
@@ -3028,10 +2715,18 @@ function updatePwaUI() {
 
   if (diagProto) diagProto.textContent = `${window.location.protocol}//${window.location.host}${window.location.pathname}`;
   if (diagOriginType) diagOriginType.textContent = originInfo.type;
-  if (diagDisplay) diagDisplay.textContent = pwaStatusInfo.isStandalone ? 'standalone (Installed)' : 'browser tab';
+  if (diagDisplay) diagDisplay.textContent = pwaStatusInfo.isStandalone ? 'standalone (Installed)' : 'browser';
   if (diagSw) {
     diagSw.textContent = pwaStatusInfo.swMessage;
-    diagSw.className = `font-bold mt-0.5 ${pwaStatusInfo.swRegistered ? 'text-emerald-300' : 'text-amber-300'}`;
+    diagSw.style.color = pwaStatusInfo.swRegistered ? '#6dd58c' : '#ffdf9e';
+  }
+}
+
+function handleBannerPwaAction() {
+  if (deferredInstallPrompt && !pwaStatusInfo.isStandalone) {
+    triggerPwaInstall();
+  } else {
+    openPwaInfoModal();
   }
 }
 
@@ -3068,8 +2763,8 @@ function switchPwaCodeTab(tab) {
 
   if (feedback) feedback.textContent = '';
 
-  const inactiveCls = 'px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 font-bold text-xs';
-  const activeCls = 'px-3 py-1.5 rounded-xl bg-indigo-600 text-white font-bold text-xs';
+  const inactiveCls = 'm3-btn m3-btn-tonal';
+  const activeCls = 'm3-btn m3-btn-primary';
 
   if (tabManifest) tabManifest.className = tab === 'manifest' ? activeCls : inactiveCls;
   if (tabSw) tabSw.className = tab === 'sw' ? activeCls : inactiveCls;
@@ -3081,40 +2776,78 @@ function switchPwaCodeTab(tab) {
   else textarea.value = getDeployAndApkGuideText();
 }
 
-function copyActivePwaSnippet() {
+async function copyActivePwaSnippet() {
   const textarea = document.getElementById('pwa-code-preview');
   const feedback = document.getElementById('pwa-copy-feedback');
   if (!textarea) return;
 
-  textarea.focus();
-  textarea.select();
   let copied = false;
-  try {
-    copied = document.execCommand('copy');
-  } catch (e) {
-    copied = false;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    try {
+      await navigator.clipboard.writeText(textarea.value);
+      copied = true;
+    } catch (e) {}
+  }
+  if (!copied) {
+    textarea.focus();
+    textarea.select();
+    try { copied = document.execCommand('copy'); } catch (e) {}
   }
 
   audio.play('click');
-  const label = activePwaTab === 'manifest' ? 'manifest.json' : activePwaTab === 'sw' ? 'sw.js' : 'GitHub guide';
-  if (feedback) feedback.textContent = copied ? `Copied ${label} to clipboard!` : 'Select and copy above manually.';
+  const label = activePwaTab === 'manifest' ? 'manifest.json' : activePwaTab === 'sw' ? 'sw.js' : 'install guide';
+  if (feedback) feedback.textContent = copied ? `Copied ${label} to clipboard!` : 'Select and copy text manually.';
+}
+
+function showUpdateSnackbar(worker) {
+  waitingServiceWorker = worker;
+  const snackbar = document.getElementById('pwa-update-snackbar');
+  const reloadBtn = document.getElementById('btn-pwa-reload');
+  if (!snackbar || !reloadBtn) return;
+  snackbar.classList.remove('hidden');
+  reloadBtn.onclick = () => {
+    snackbar.classList.add('hidden');
+    if (waitingServiceWorker) {
+      waitingServiceWorker.postMessage({ type: 'SKIP_WAITING' });
+    }
+  };
 }
 
 if ('serviceWorker' in navigator) {
+  let refreshingForSw = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (refreshingForSw) return;
+    refreshingForSw = true;
+    window.location.reload();
+  });
+
   window.addEventListener('load', async () => {
     refreshPwaEnvironmentState();
     const proto = window.location.protocol;
     if (proto !== 'http:' && proto !== 'https:') return;
 
     try {
-      await navigator.serviceWorker.register('./sw.js', { scope: './' });
+      const reg = await navigator.serviceWorker.register('./sw.js', { scope: './' });
       pwaStatusInfo.swRegistered = true;
-      pwaStatusInfo.swMessage = 'Registered (./sw.js)';
-      console.log('PRISM CLASH: Service Worker Registered for GitHub Pages');
+      pwaStatusInfo.swMessage = 'Active (./sw.js)';
+
+      if (reg.waiting && navigator.serviceWorker.controller) {
+        showUpdateSnackbar(reg.waiting);
+      }
+
+      reg.addEventListener('updatefound', () => {
+        const newWorker = reg.installing;
+        if (!newWorker) return;
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            showUpdateSnackbar(newWorker);
+          }
+        });
+      });
     } catch (error) {
       pwaStatusInfo.swRegistered = false;
-      pwaStatusInfo.swMessage = './sw.js registration blocked or missing';
-      console.warn('PRISM CLASH Service Worker Notice:', error);
+      pwaStatusInfo.swMessage = 'Registration unavailable';
+      console.warn('KING BATTLE Service Worker Notice:', error);
     }
     updatePwaUI();
   });
@@ -3130,18 +2863,39 @@ window.addEventListener('appinstalled', () => {
   deferredInstallPrompt = null;
   pwaStatusInfo.isStandalone = true;
   audio.play('victory');
-  showFloatingBanner('PRISM CLASH INSTALLED! 📲', 'from-emerald-500 to-teal-500');
+  showFloatingBanner('KING BATTLE READY! 👑', 'emerald');
+  updateNetworkBadge();
   updatePwaUI();
 });
 
+window.addEventListener('online', updateNetworkBadge);
+window.addEventListener('offline', updateNetworkBadge);
+
 window.matchMedia('(display-mode: standalone)').addEventListener('change', (e) => {
   pwaStatusInfo.isStandalone = e.matches;
+  updateNetworkBadge();
   updatePwaUI();
 });
+
+// Handle PWA App Shortcuts (?mode=quickplay | blitz | challenge)
+function handlePwaLaunchParams() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const mode = params.get('mode');
+    if (!mode) return;
+    if (window.history && window.history.replaceState) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+    if (mode === 'quickplay') initMatch(buildDefaultConfig());
+    else if (mode === 'blitz') launchPresetMode('quick');
+    else if (mode === 'challenge') launchPresetMode('challenge');
+  } catch (e) {}
+}
 
 // Boot initialization
 applySavedPreferences();
 refreshPwaEnvironmentState();
+handlePwaLaunchParams();
 </script>
 </body>
 </html>

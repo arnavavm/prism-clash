@@ -1,0 +1,112 @@
+{
+  "id": "./",
+  "name": "KING BATTLE — Royal Card Arena",
+  "short_name": "King Battle",
+  "description": "Cosmic tactical 108-card shedding game with AI opponents, custom house rules, pass-and-play, and full offline play.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "orientation": "any",
+  "background_color": "#0b0f19",
+  "theme_color": "#111625",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": [
+    "games",
+    "card",
+    "entertainment"
+  ],
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./icons/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "./icons/screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "KING BATTLE Royal Card Arena on Desktop"
+    },
+    {
+      "src": "./icons/screenshot-narrow.png",
+      "sizes": "720x1280",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "KING BATTLE Responsive Mobile Arena"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Quick Play (Classic 4P)",
+      "short_name": "Quick Play",
+      "description": "Jump straight into a 4-player classic match",
+      "url": "./?mode=quickplay",
+      "icons": [
+        {
+          "src": "./icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Quick Blitz (1v1)",
+      "short_name": "Blitz 1v1",
+      "description": "Fast 2-player single-round duel",
+      "url": "./?mode=blitz",
+      "icons": [
+        {
+          "src": "./icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Grandmaster Challenge",
+      "short_name": "Hard AI",
+      "description": "Battle 3 tactical Hard AI opponents",
+      "url": "./?mode=challenge",
+      "icons": [
+        {
+          "src": "./icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}
