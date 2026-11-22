@@ -1,0 +1,3147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0b0e1c" />
+  <meta name="background-color" content="#070913" />
+  <meta name="description" content="PRISM CLASH — Cosmic tactical 108-card shedding game configured for GitHub Pages PWA installation." />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Prism Clash" />
+  <link rel="manifest" href="./manifest.json" />
+  <link id="pwa-apple-icon" rel="apple-touch-icon" href="./icons/icon-192.png" />
+  <title>PRISM CLASH — Cosmic Card Arena</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-theme: radial-gradient(circle at 50% 20%, #1e1b4b 0%, #0f172a 55%, #020617 100%);
+      --card-crimson: linear-gradient(145deg, #ff3b5c 0%, #be123c 100%);
+      --card-gold: linear-gradient(145deg, #fbbf24 0%, #d97706 100%);
+      --card-emerald: linear-gradient(145deg, #10b981 0%, #047857 100%);
+      --card-cobalt: linear-gradient(145deg, #3b82f6 0%, #1d4ed8 100%);
+      --card-prism: conic-gradient(from 45deg, #ff3b5c, #fbbf24, #10b981, #3b82f6, #a855f7, #ff3b5c);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Outfit', sans-serif;
+      background: #020617;
+      color: #f8fafc;
+      touch-action: manipulation;
+    }
+
+    .game-bg {
+      background: var(--bg-theme);
+      transition: background 0.5s ease;
+    }
+
+    .bg-nebula { --bg-theme: radial-gradient(circle at 50% 25%, #2e1065 0%, #0f172a 60%, #020617 100%); }
+    .bg-cyber { --bg-theme: radial-gradient(circle at 50% 25%, #064e3b 0%, #090d16 60%, #020617 100%); }
+    .bg-solar { --bg-theme: radial-gradient(circle at 50% 25%, #7c2d12 0%, #18181b 60%, #09090b 100%); }
+    .bg-abyss { --bg-theme: radial-gradient(circle at 50% 25%, #1e3a8a 0%, #090d16 60%, #020617 100%); }
+
+    /* Card Styling */
+    .prism-card {
+      position: relative;
+      border-radius: 14px;
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.45);
+      border: 3px solid rgba(255, 255, 255, 0.92);
+      transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.22s ease, filter 0.2s ease;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .no-anim .prism-card,
+    .no-anim * {
+      transition: none !important;
+      animation: none !important;
+    }
+
+    .card-red { background: var(--card-crimson); }
+    .card-yellow { background: var(--card-gold); }
+    .card-green { background: var(--card-emerald); }
+    .card-blue { background: var(--card-cobalt); }
+    .card-wild {
+      background: #0f172a;
+      border-color: #f8fafc;
+    }
+
+    .card-wild::before {
+      content: '';
+      position: absolute;
+      inset: -12px;
+      background: var(--card-prism);
+      opacity: 0.92;
+      z-index: 0;
+    }
+
+    .card-inner-oval {
+      position: absolute;
+      inset: 12% 10%;
+      background: rgba(15, 23, 42, 0.22);
+      border-radius: 999px;
+      transform: rotate(-22deg);
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      z-index: 1;
+    }
+
+    .card-wild .card-inner-oval {
+      background: rgba(2, 6, 23, 0.78);
+      border-color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* Card Backs */
+    .card-back {
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+      border: 2.5px solid #cbd5e1;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.55);
+    }
+    .card-back-prism { background: linear-gradient(135deg, #1e1b4b, #4c1d95, #0f172a); border-color: #a855f7; }
+    .card-back-solar { background: linear-gradient(135deg, #451a03, #9a3412, #1c1917); border-color: #f59e0b; }
+    .card-back-matrix { background: linear-gradient(135deg, #022c22, #065f46, #090d16); border-color: #10b981; }
+
+    /* Interactive Hand Cards */
+    .hand-card {
+      width: 78px;
+      height: 116px;
+      cursor: pointer;
+    }
+    @media (min-width: 640px) {
+      .hand-card {
+        width: 96px;
+        height: 142px;
+      }
+    }
+    @media (min-width: 1024px) {
+      .hand-card {
+        width: 106px;
+        height: 156px;
+      }
+    }
+
+    .hand-card.playable {
+      box-shadow: 0 0 18px rgba(255, 255, 255, 0.65), 0 10px 22px rgba(0, 0, 0, 0.6);
+      transform: translateY(-10px);
+    }
+    .hand-card.playable:hover {
+      transform: translateY(-22px) scale(1.06);
+      z-index: 40 !important;
+      box-shadow: 0 0 26px rgba(250, 204, 21, 0.9), 0 16px 28px rgba(0, 0, 0, 0.7);
+    }
+    .hand-card.unplayable {
+      filter: brightness(0.65) saturate(0.8);
+    }
+    .hand-card.unplayable:hover {
+      transform: translateY(-4px);
+    }
+
+    @keyframes shakeCard {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-8px) rotate(-4deg); }
+      40% { transform: translateX(8px) rotate(4deg); }
+      60% { transform: translateX(-6px) rotate(-2deg); }
+      80% { transform: translateX(6px) rotate(2deg); }
+    }
+    .shake-invalid {
+      animation: shakeCard 0.35s ease-in-out !important;
+      box-shadow: 0 0 22px #ef4444 !important;
+    }
+
+    @keyframes popBanner {
+      0% { transform: translate(-50%, -50%) scale(0.4); opacity: 0; }
+      20% { transform: translate(-50%, -50%) scale(1.12); opacity: 1; }
+      80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      100% { transform: translate(-50%, -65%) scale(0.95); opacity: 0; }
+    }
+    .action-banner {
+      animation: popBanner 1.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 15px rgba(244, 63, 94, 0.7), 0 0 30px rgba(250, 204, 21, 0.5); }
+      50% { transform: scale(1.07); box-shadow: 0 0 25px rgba(244, 63, 94, 0.95), 0 0 45px rgba(250, 204, 21, 0.85); }
+    }
+    .prism-btn-pulse {
+      animation: pulseGlow 1.1s infinite ease-in-out;
+    }
+
+    @keyframes spinSlow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes spinSlowRev {
+      from { transform: rotate(360deg); }
+      to { transform: rotate(0deg); }
+    }
+    .dir-cw { animation: spinSlow 9s linear infinite; }
+    .dir-ccw { animation: spinSlowRev 9s linear infinite; }
+
+    .hand-scroll::-webkit-scrollbar {
+      height: 6px;
+    }
+    .hand-scroll::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.4);
+      border-radius: 999px;
+    }
+    .hand-scroll::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.45);
+      border-radius: 999px;
+    }
+
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.82);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+    }
+
+    .text-stroke {
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.85), 0 0 2px rgba(0, 0, 0, 0.9);
+    }
+
+    #confetti-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 90;
+    }
+  </style>
+</head>
+<body class="game-bg bg-nebula select-none">
+
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- ==================== MAIN MENU SCREEN ==================== -->
+  <div id="screen-menu" class="fixed inset-0 z-20 flex flex-col items-center justify-between p-4 sm:p-6 overflow-y-auto">
+    <!-- Top Utility Bar -->
+    <div class="w-full max-w-5xl flex items-center justify-between">
+      <button onclick="openModal('modal-profile')" class="glass-panel flex items-center gap-2.5 px-3.5 py-2 rounded-2xl hover:bg-slate-800/90 transition active:scale-95">
+        <span id="menu-player-avatar" class="text-2xl">🚀</span>
+        <div class="text-left">
+          <div id="menu-player-name" class="text-sm font-bold text-white leading-tight">Nova</div>
+          <div class="text-[11px] text-indigo-300 font-medium">Edit Profile</div>
+        </div>
+      </button>
+
+      <div class="flex items-center gap-2">
+        <button id="btn-install-app" onclick="triggerPwaInstall()" class="hidden glass-panel px-3.5 py-2 rounded-2xl border border-emerald-400/50 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-200 transition active:scale-95 text-xs sm:text-sm font-extrabold flex items-center gap-1.5 shadow-lg">
+          <span>📲</span> <span>Install App</span>
+        </button>
+        <button id="btn-quick-mute" onclick="toggleMute()" title="Toggle Mute" class="glass-panel p-2.5 rounded-2xl hover:bg-slate-800/90 transition active:scale-95 text-lg">
+          🔊
+        </button>
+        <button onclick="openModal('modal-settings')" class="glass-panel px-3.5 py-2.5 rounded-2xl hover:bg-slate-800/90 transition active:scale-95 text-sm font-bold flex items-center gap-1.5">
+          <span>⚙️</span> <span class="hidden sm:inline">Settings</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Center Logo & Actions -->
+    <div class="flex flex-col items-center my-auto py-4 w-full max-w-md text-center">
+      <div class="mb-3 relative">
+        <svg class="w-24 h-24 sm:w-28 sm:h-28 drop-shadow-[0_0_25px_rgba(168,85,247,0.65)]" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="prismGrad1" x1="10" y1="10" x2="110" y2="110" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#FF3B5C"/>
+              <stop offset="33%" stop-color="#FBBF24"/>
+              <stop offset="66%" stop-color="#10B981"/>
+              <stop offset="100%" stop-color="#3B82F6"/>
+            </linearGradient>
+            <linearGradient id="prismInner" x1="60" y1="15" x2="60" y2="105" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.95"/>
+              <stop offset="100%" stop-color="#C084FC" stop-opacity="0.35"/>
+            </linearGradient>
+          </defs>
+          <polygon points="60,8 110,38 110,82 60,112 10,82 10,38" fill="#0F172A" stroke="url(#prismGrad1)" stroke-width="6"/>
+          <polygon points="60,20 96,60 60,100 24,60" fill="url(#prismGrad1)" opacity="0.88"/>
+          <polygon points="60,20 96,60 60,60" fill="url(#prismInner)" opacity="0.75"/>
+          <circle cx="60" cy="60" r="14" fill="#0F172A" stroke="#FFFFFF" stroke-width="3"/>
+          <path d="M60 50 L63 57 L70 60 L63 63 L60 70 L57 63 L50 60 L57 57 Z" fill="#FBBF24"/>
+        </svg>
+      </div>
+
+      <h1 class="text-4xl sm:text-6xl font-black tracking-tight bg-gradient-to-r from-rose-400 via-amber-300 via-emerald-300 to-sky-400 bg-clip-text text-transparent drop-shadow">
+        PRISM CLASH
+      </h1>
+      <p class="text-slate-300 text-xs sm:text-sm tracking-widest uppercase font-semibold mt-1 mb-6">
+        Cosmic Tactical Card Arena
+      </p>
+
+      <div class="w-full space-y-3">
+        <button onclick="startQuickPlay()" class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-rose-500 via-amber-500 to-emerald-500 hover:brightness-110 text-slate-950 font-black text-lg sm:text-xl shadow-[0_8px_25px_rgba(244,63,94,0.45)] transition transform active:scale-95 flex items-center justify-center gap-2">
+          <span>⚡</span> QUICK PLAY (CLASSIC 4P)
+        </button>
+
+        <button onclick="openModal('modal-modes')" class="w-full py-3.5 px-6 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-base sm:text-lg shadow-lg transition transform active:scale-95 flex items-center justify-center gap-2">
+          <span>🎮</span> SELECT GAME MODE
+        </button>
+
+        <button onclick="openCustomMatch()" class="w-full py-3.5 px-6 rounded-2xl glass-panel hover:bg-slate-800/90 text-white font-bold text-base transition transform active:scale-95 flex items-center justify-center gap-2">
+          <span>🛠️</span> CUSTOM MATCH & HOUSE RULES
+        </button>
+
+        <!-- PWA Status & Studio Banner -->
+        <div id="pwa-menu-banner" class="glass-panel w-full rounded-2xl p-3 border border-indigo-400/25 flex items-center justify-between gap-3 text-left">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <span id="pwa-status-icon" class="text-xl shrink-0">🌐</span>
+            <div class="min-w-0">
+              <div id="pwa-status-title" class="text-xs font-extrabold text-white truncate">GitHub Pages PWA Ready</div>
+              <div id="pwa-status-sub" class="text-[11px] text-slate-300 truncate">Checking Service Worker & Install...</div>
+            </div>
+          </div>
+          <button id="btn-banner-install" onclick="openPwaInfoModal()" class="shrink-0 px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs transition active:scale-95">
+            PWA Studio
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2.5 w-full mt-4">
+        <button onclick="openModal('modal-rules')" class="glass-panel py-3 px-2 rounded-2xl hover:bg-slate-800/90 transition active:scale-95 flex flex-col items-center gap-1">
+          <span class="text-xl">📖</span>
+          <span class="text-xs font-bold">How to Play</span>
+        </button>
+        <button onclick="openStatsModal()" class="glass-panel py-3 px-2 rounded-2xl hover:bg-slate-800/90 transition active:scale-95 flex flex-col items-center gap-1">
+          <span class="text-xl">🏆</span>
+          <span class="text-xs font-bold">Stats & Medals</span>
+        </button>
+        <button onclick="openModal('modal-about')" class="glass-panel py-3 px-2 rounded-2xl hover:bg-slate-800/90 transition active:scale-95 flex flex-col items-center gap-1">
+          <span class="text-xl">✨</span>
+          <span class="text-xs font-bold">Deck & Info</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="text-[11px] text-slate-400 font-medium">
+      108-Card Rules • Colour-Blind Accessible • GitHub Pages PWA Ready
+    </div>
+  </div>
+
+  <!-- ==================== GAMEPLAY SCREEN ==================== -->
+  <div id="screen-game" class="fixed inset-0 z-10 hidden flex-col justify-between p-2 sm:p-4">
+    <!-- Top HUD & Opponents -->
+    <div class="w-full max-w-6xl mx-auto flex flex-col gap-2">
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <button onclick="pauseGame()" class="glass-panel px-3 py-2 rounded-xl hover:bg-slate-800 font-bold text-xs sm:text-sm flex items-center gap-1.5 active:scale-95">
+            <span>⏸️</span> <span class="hidden sm:inline">Pause</span>
+          </button>
+          <div class="glass-panel px-3 py-1.5 rounded-xl text-xs font-bold text-indigo-200 flex items-center gap-2">
+            <span id="hud-mode-badge">Classic</span>
+            <span class="text-slate-500">|</span>
+            <span id="hud-round-badge">Round 1</span>
+            <span id="hud-target-badge" class="hidden sm:inline text-amber-300"></span>
+          </div>
+        </div>
+
+        <div id="hud-house-rules" class="hidden md:flex items-center gap-1.5 flex-wrap justify-center"></div>
+
+        <div class="flex items-center gap-1.5">
+          <button onclick="openModal('modal-rules')" class="glass-panel p-2 rounded-xl hover:bg-slate-800 text-xs font-bold active:scale-95" title="Rules">📖</button>
+          <button id="btn-game-mute" onclick="toggleMute()" class="glass-panel p-2 rounded-xl hover:bg-slate-800 text-xs font-bold active:scale-95" title="Mute">🔊</button>
+        </div>
+      </div>
+
+      <div id="opponents-container" class="flex items-center justify-center gap-2 sm:gap-4 flex-wrap py-1"></div>
+    </div>
+
+    <!-- Center Arena -->
+    <div class="relative flex-1 flex flex-col items-center justify-center my-1">
+      <div id="turn-indicator" class="mb-2 sm:mb-3 px-4 py-1.5 rounded-full glass-panel text-xs sm:text-sm font-extrabold tracking-wide text-center shadow-lg transition-all">
+        Your Turn!
+      </div>
+
+      <div class="relative flex items-center justify-center gap-6 sm:gap-12 p-4 sm:p-6">
+        <div id="direction-ring" class="dir-cw pointer-events-none absolute w-56 h-56 sm:w-72 sm:h-72 rounded-full border-2 border-dashed border-white/20 flex items-center justify-between px-1">
+          <span class="text-white/40 text-lg font-black">↻</span>
+          <span class="text-white/40 text-lg font-black">↻</span>
+        </div>
+
+        <!-- Draw Pile -->
+        <div class="flex flex-col items-center gap-1.5 z-10">
+          <button id="btn-draw-pile" onclick="humanDrawCard()" class="relative group focus:outline-none active:scale-95 transition transform">
+            <div id="draw-pile-visual" class="w-20 h-28 sm:w-24 sm:h-36 rounded-2xl card-back flex flex-col items-center justify-center relative">
+              <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 border border-white/30 flex items-center justify-center">
+                <span class="text-lg sm:text-xl">✦</span>
+              </div>
+              <span id="draw-pile-count" class="mt-1.5 text-[11px] font-black tracking-wider text-slate-200 bg-black/50 px-2 py-0.5 rounded-full">108</span>
+            </div>
+            <div id="draw-pile-glow" class="hidden absolute -inset-1.5 rounded-2xl border-2 border-amber-400 animate-pulse pointer-events-none"></div>
+          </button>
+          <span class="text-[11px] font-bold text-slate-300 uppercase tracking-wider">Draw</span>
+        </div>
+
+        <!-- Active Colour Indicator -->
+        <div class="flex flex-col items-center gap-2 z-10">
+          <div id="active-color-orb" class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl border-2 border-white shadow-lg flex flex-col items-center justify-center transition-all duration-300">
+            <span id="active-color-icon" class="text-lg sm:text-xl leading-none">🔥</span>
+            <span id="active-color-label" class="text-[9px] font-black uppercase tracking-wider mt-0.5">RED</span>
+          </div>
+          <div id="pending-stack-badge" class="hidden px-2.5 py-0.5 rounded-full bg-rose-600 text-white text-xs font-black animate-bounce shadow">
+            +2 STACK
+          </div>
+          <div id="direction-label" class="text-[10px] font-bold text-slate-300 uppercase tracking-wider">
+            Clockwise ↻
+          </div>
+        </div>
+
+        <!-- Discard Pile -->
+        <div class="flex flex-col items-center gap-1.5 z-10">
+          <div id="discard-pile-slot" class="w-20 h-28 sm:w-24 sm:h-36 flex items-center justify-center"></div>
+          <span class="text-[11px] font-bold text-slate-300 uppercase tracking-wider">Discard</span>
+        </div>
+      </div>
+
+      <!-- Post-Draw Bar -->
+      <div id="post-draw-bar" class="hidden mt-2 glass-panel px-4 py-2 rounded-2xl flex items-center gap-3 z-20 shadow-xl border border-amber-400/50">
+        <span class="text-xs sm:text-sm font-bold text-amber-200">Playable card drawn!</span>
+        <button onclick="playDrawnCard()" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs sm:text-sm active:scale-95">
+          Play Now
+        </button>
+        <button onclick="passAfterDraw()" class="px-3.5 py-1.5 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs sm:text-sm active:scale-95">
+          Keep & Pass
+        </button>
+      </div>
+    </div>
+
+    <div id="floating-banner-container" class="pointer-events-none fixed inset-0 z-40"></div>
+
+    <!-- Bottom Hand Area -->
+    <div class="w-full max-w-6xl mx-auto flex flex-col gap-2">
+      <div class="flex items-center justify-between px-1 gap-2">
+        <div class="flex items-center gap-2">
+          <span id="human-avatar-hud" class="text-xl">🚀</span>
+          <div>
+            <div class="flex items-center gap-2">
+              <span id="human-name-hud" class="text-xs sm:text-sm font-extrabold text-white">Nova</span>
+              <span id="human-score-hud" class="text-xs font-bold text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded-full">0 pts</span>
+            </div>
+            <div id="human-card-count-hud" class="text-[11px] text-slate-300">7 cards</div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button id="btn-catch-uno" onclick="catchUnoCall()" class="hidden px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs sm:text-sm shadow-lg animate-bounce active:scale-95">
+            🚨 CATCH! (+2)
+          </button>
+
+          <button id="btn-declare-prism" onclick="declarePrism()" class="px-4 py-2 sm:px-5 sm:py-2.5 rounded-2xl bg-gradient-to-r from-rose-500 via-amber-400 to-sky-500 text-slate-950 font-black text-xs sm:text-base shadow-lg transition transform active:scale-95 opacity-60">
+            ✦ PRISM! (1 LEFT)
+          </button>
+        </div>
+      </div>
+
+      <div id="human-hand-scroll" class="hand-scroll w-full overflow-x-auto pb-2 pt-5 px-4 flex items-center justify-start sm:justify-center min-h-[145px] sm:min-h-[175px]">
+        <div id="human-hand-cards" class="flex items-center transition-all duration-200"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- Wild Color Picker -->
+  <div id="modal-color-picker" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-4">
+    <div class="glass-panel max-w-sm w-full rounded-3xl p-6 text-center shadow-2xl border border-white/20">
+      <h3 class="text-xl font-black text-white mb-1">Choose Next Prism Colour</h3>
+      <p class="text-xs text-slate-300 mb-5">Select active colour for next player</p>
+      <div class="grid grid-cols-2 gap-3.5">
+        <button onclick="selectWildColor('red')" class="py-5 rounded-2xl card-red text-white font-black text-lg shadow-lg hover:scale-105 transition active:scale-95 flex flex-col items-center gap-1 border-2 border-white">
+          <span class="text-2xl">🔥</span>
+          <span>CRIMSON</span>
+        </button>
+        <button onclick="selectWildColor('yellow')" class="py-5 rounded-2xl card-yellow text-slate-950 font-black text-lg shadow-lg hover:scale-105 transition active:scale-95 flex flex-col items-center gap-1 border-2 border-white">
+          <span class="text-2xl">☀️</span>
+          <span>GOLD</span>
+        </button>
+        <button onclick="selectWildColor('green')" class="py-5 rounded-2xl card-green text-white font-black text-lg shadow-lg hover:scale-105 transition active:scale-95 flex flex-col items-center gap-1 border-2 border-white">
+          <span class="text-2xl">🍃</span>
+          <span>EMERALD</span>
+        </button>
+        <button onclick="selectWildColor('blue')" class="py-5 rounded-2xl card-blue text-white font-black text-lg shadow-lg hover:scale-105 transition active:scale-95 flex flex-col items-center gap-1 border-2 border-white">
+          <span class="text-2xl">🌊</span>
+          <span>COBALT</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Wild +4 Challenge -->
+  <div id="modal-challenge" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+    <div class="glass-panel max-w-md w-full rounded-3xl p-6 text-center shadow-2xl border border-amber-400/40">
+      <div class="text-4xl mb-2">⚡</div>
+      <h3 id="challenge-title" class="text-xl font-black text-white mb-2">Wild +4 Played Against You!</h3>
+      <p id="challenge-desc" class="text-sm text-slate-300 mb-5"></p>
+      <div class="grid grid-cols-2 gap-3">
+        <button onclick="resolveHumanChallenge(true)" class="py-3.5 px-4 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-sm shadow-lg active:scale-95">
+          🔍 CHALLENGE (+4 or +6)
+        </button>
+        <button onclick="resolveHumanChallenge(false)" class="py-3.5 px-4 rounded-2xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-sm active:scale-95">
+          Accept & Draw 4
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7-0 Swap Target -->
+  <div id="modal-swap-target" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+    <div class="glass-panel max-w-sm w-full rounded-3xl p-6 text-center shadow-2xl">
+      <div class="text-3xl mb-1">🔄</div>
+      <h3 class="text-xl font-black text-white mb-1">7-0 Rule: Swap Hands!</h3>
+      <p class="text-xs text-slate-300 mb-4">Choose which player to swap your hand with:</p>
+      <div id="swap-targets-list" class="space-y-2.5"></div>
+    </div>
+  </div>
+
+  <!-- Pass Device Curtain -->
+  <div id="modal-pass-device" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/95 backdrop-blur-md p-6">
+    <div class="glass-panel max-w-sm w-full rounded-3xl p-8 text-center shadow-2xl border border-indigo-400/30">
+      <div id="pass-next-avatar" class="text-5xl mb-3">👾</div>
+      <h3 class="text-xs uppercase tracking-widest text-indigo-300 font-bold mb-1">Pass Device To</h3>
+      <div id="pass-next-name" class="text-2xl font-black text-white mb-3">Player 2</div>
+      <p class="text-xs text-slate-400 mb-6">Make sure other players look away before revealing cards.</p>
+      <button onclick="confirmPassDevice()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-500 hover:brightness-110 text-white font-black text-base shadow-lg active:scale-95">
+        👁️ I AM READY — SHOW CARDS
+      </button>
+    </div>
+  </div>
+
+  <!-- Round End -->
+  <div id="modal-round-end" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
+    <div class="glass-panel max-w-md w-full rounded-3xl p-6 text-center shadow-2xl border border-amber-400/40 my-auto">
+      <div id="end-winner-avatar" class="text-5xl mb-2">🏆</div>
+      <div id="end-subtitle" class="text-xs font-extrabold uppercase tracking-widest text-amber-300">Round Complete!</div>
+      <h2 id="end-winner-title" class="text-2xl sm:text-3xl font-black text-white mt-1 mb-4">Nova Wins!</h2>
+
+      <div class="bg-slate-950/60 rounded-2xl p-3 mb-5 border border-white/10">
+        <div class="text-[11px] uppercase tracking-wider text-slate-400 font-bold mb-2 flex justify-between px-2">
+          <span>Player</span>
+          <span>Round / Total</span>
+        </div>
+        <div id="end-scoreboard" class="space-y-1.5 text-sm"></div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-2.5">
+        <button id="btn-next-round" onclick="startNextRound()" class="flex-1 py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black text-sm sm:text-base shadow-lg active:scale-95">
+          Next Round ➔
+        </button>
+        <button onclick="returnToMenu()" class="flex-1 py-3.5 px-4 rounded-2xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-sm sm:text-base active:scale-95">
+          Main Menu
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pause Modal -->
+  <div id="modal-pause" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+    <div class="glass-panel max-w-sm w-full rounded-3xl p-6 text-center shadow-2xl">
+      <h3 class="text-2xl font-black text-white mb-5">Game Paused</h3>
+      <div class="space-y-3">
+        <button onclick="resumeGame()" class="w-full py-3.5 rounded-2xl bg-emerald-500 text-slate-950 font-black text-base active:scale-95">
+          ▶️ Resume Match
+        </button>
+        <button onclick="openModal('modal-settings')" class="w-full py-3 rounded-2xl glass-panel hover:bg-slate-800 text-white font-bold text-sm active:scale-95">
+          ⚙️ Audio & Display Settings
+        </button>
+        <button onclick="restartCurrentMatch()" class="w-full py-3 rounded-2xl bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold text-sm active:scale-95">
+          🔄 Restart Match
+        </button>
+        <button onclick="returnToMenu()" class="w-full py-3 rounded-2xl bg-rose-500/20 border border-rose-500/40 text-rose-300 font-bold text-sm active:scale-95">
+          🏠 Quit to Main Menu
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modes Modal -->
+  <div id="modal-modes" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
+    <div class="glass-panel max-w-lg w-full rounded-3xl p-6 shadow-2xl my-auto">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-xl sm:text-2xl font-black text-white">Select Game Mode</h3>
+        <button onclick="closeModal('modal-modes')" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm font-bold">✕</button>
+      </div>
+      <div class="space-y-2.5">
+        <button onclick="launchPresetMode('classic')" class="w-full text-left p-4 rounded-2xl bg-slate-800/70 hover:bg-indigo-600/40 border border-white/10 transition flex items-center gap-3.5 active:scale-98">
+          <span class="text-3xl">🃏</span>
+          <div>
+            <div class="font-extrabold text-white">Classic Mode (4 Players)</div>
+            <div class="text-xs text-slate-300">Official 108-card rules, Medium AI, target 500 pts.</div>
+          </div>
+        </button>
+        <button onclick="launchPresetMode('quick')" class="w-full text-left p-4 rounded-2xl bg-slate-800/70 hover:bg-amber-600/40 border border-white/10 transition flex items-center gap-3.5 active:scale-98">
+          <span class="text-3xl">⚡</span>
+          <div>
+            <div class="font-extrabold text-white">Quick Blitz (1v1 Single Round)</div>
+            <div class="text-xs text-slate-300">Fast 2-player duel with 5 starting cards.</div>
+          </div>
+        </button>
+        <button onclick="launchPresetMode('challenge')" class="w-full text-left p-4 rounded-2xl bg-slate-800/70 hover:bg-rose-600/40 border border-white/10 transition flex items-center gap-3.5 active:scale-98">
+          <span class="text-3xl">🔥</span>
+          <div>
+            <div class="font-extrabold text-white">Grandmaster Challenge (Hard AI)</div>
+            <div class="text-xs text-slate-300">3 tactical Hard AI opponents who challenge bluffs.</div>
+          </div>
+        </button>
+        <button onclick="launchPresetMode('practice')" class="w-full text-left p-4 rounded-2xl bg-slate-800/70 hover:bg-emerald-600/40 border border-white/10 transition flex items-center gap-3.5 active:scale-98">
+          <span class="text-3xl">🎓</span>
+          <div>
+            <div class="font-extrabold text-white">Relaxed Practice</div>
+            <div class="text-xs text-slate-300">Easy AI opponents, single round learning.</div>
+          </div>
+        </button>
+        <button onclick="launchPresetMode('local')" class="w-full text-left p-4 rounded-2xl bg-slate-800/70 hover:bg-sky-600/40 border border-white/10 transition flex items-center gap-3.5 active:scale-98">
+          <span class="text-3xl">👥</span>
+          <div>
+            <div class="font-extrabold text-white">Local Pass & Play (2 Humans)</div>
+            <div class="text-xs text-slate-300">Play on one screen with privacy curtains.</div>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Match Modal -->
+  <div id="modal-custom" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
+    <div class="glass-panel max-w-lg w-full rounded-3xl p-5 sm:p-6 shadow-2xl my-auto max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-xl font-black text-white">Custom Match & Rules</h3>
+        <button onclick="closeModal('modal-custom')" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm font-bold">✕</button>
+      </div>
+
+      <div class="space-y-4 text-sm">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1">Total Players (2–6)</label>
+            <select id="cfg-player-count" class="w-full bg-slate-900 border border-white/15 rounded-xl px-3 py-2 text-white font-bold">
+              <option value="2">2 Players</option>
+              <option value="3">3 Players</option>
+              <option value="4" selected>4 Players</option>
+              <option value="5">5 Players</option>
+              <option value="6">6 Players</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1">Opponent Type</label>
+            <select id="cfg-opponent-type" class="w-full bg-slate-900 border border-white/15 rounded-xl px-3 py-2 text-white font-bold">
+              <option value="ai">Computer AI</option>
+              <option value="local">Local Pass & Play (All Human)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2.5">
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1">AI Difficulty</label>
+            <select id="cfg-ai-diff" class="w-full bg-slate-900 border border-white/15 rounded-xl px-2.5 py-2 text-white font-bold">
+              <option value="easy">Easy</option>
+              <option value="medium" selected>Medium</option>
+              <option value="hard">Hard</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1">Start Cards</label>
+            <select id="cfg-hand-size" class="w-full bg-slate-900 border border-white/15 rounded-xl px-2.5 py-2 text-white font-bold">
+              <option value="5">5 Cards</option>
+              <option value="7" selected>7 Cards</option>
+              <option value="10">10 Cards</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1">Score Target</label>
+            <select id="cfg-score-target" class="w-full bg-slate-900 border border-white/15 rounded-xl px-2.5 py-2 text-white font-bold">
+              <option value="0">1 Round</option>
+              <option value="100">100 Pts</option>
+              <option value="200">200 Pts</option>
+              <option value="300">300 Pts</option>
+              <option value="500" selected>500 Pts</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="border-t border-white/10 pt-3">
+          <div class="text-xs font-extrabold uppercase tracking-wider text-indigo-300 mb-2.5">Optional House Rules</div>
+          <div class="space-y-2.5">
+            <label class="flex items-start gap-3 p-2.5 rounded-xl bg-slate-900/70 border border-white/10 cursor-pointer">
+              <input id="hr-stacking" type="checkbox" class="mt-1 w-4 h-4 accent-indigo-500">
+              <div>
+                <div class="font-bold text-white text-xs sm:text-sm">Draw-Card Stacking (+2 on +2, +4 on +4)</div>
+                <div class="text-[11px] text-slate-400">Pass a draw penalty to next player with matching card.</div>
+              </div>
+            </label>
+
+            <label class="flex items-start gap-3 p-2.5 rounded-xl bg-slate-900/70 border border-white/10 cursor-pointer">
+              <input id="hr-seven-zero" type="checkbox" class="mt-1 w-4 h-4 accent-indigo-500">
+              <div>
+                <div class="font-bold text-white text-xs sm:text-sm">Seven-Zero Hand Swap</div>
+                <div class="text-[11px] text-slate-400">Playing a 0 rotates hands; playing a 7 lets you swap hands.</div>
+              </div>
+            </label>
+
+            <label class="flex items-start gap-3 p-2.5 rounded-xl bg-slate-900/70 border border-white/10 cursor-pointer">
+              <input id="hr-jump-in" type="checkbox" class="mt-1 w-4 h-4 accent-indigo-500">
+              <div>
+                <div class="font-bold text-white text-xs sm:text-sm">Jump-In (Exact Match Interrupt)</div>
+                <div class="text-[11px] text-slate-400">Play an identical card immediately out of turn.</div>
+              </div>
+            </label>
+
+            <label class="flex items-start gap-3 p-2.5 rounded-xl bg-slate-900/70 border border-white/10 cursor-pointer">
+              <input id="hr-draw-until" type="checkbox" class="mt-1 w-4 h-4 accent-indigo-500">
+              <div>
+                <div class="font-bold text-white text-xs sm:text-sm">Draw Until Playable</div>
+                <div class="text-[11px] text-slate-400">Keep drawing automatically until pulling a playable card.</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <button onclick="startCustomMatch()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-black text-base shadow-lg active:scale-95">
+          🚀 START CUSTOM MATCH
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Modal -->
+  <div id="modal-profile" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
+    <div class="glass-panel max-w-md w-full rounded-3xl p-6 shadow-2xl my-auto">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-xl font-black text-white">Player Profile & Style</h3>
+        <button onclick="closeModal('modal-profile')" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm font-bold">✕</button>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Display Name</label>
+          <input id="prof-name-input" type="text" maxlength="16" placeholder="Enter name" class="w-full bg-slate-900 border border-white/20 rounded-xl px-3.5 py-2.5 text-white font-bold focus:outline-none focus:border-indigo-400">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1.5">Choose Avatar</label>
+          <div id="prof-avatar-grid" class="grid grid-cols-6 gap-2"></div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1.5">Card Back Theme</label>
+          <div class="grid grid-cols-3 gap-2">
+            <button type="button" onclick="selectCardBack('prism')" data-cb="prism" class="cb-opt p-2.5 rounded-xl border border-white/20 bg-slate-900 text-xs font-bold text-center">🌌 Prism</button>
+            <button type="button" onclick="selectCardBack('solar')" data-cb="solar" class="cb-opt p-2.5 rounded-xl border border-white/20 bg-slate-900 text-xs font-bold text-center">🔥 Solar</button>
+            <button type="button" onclick="selectCardBack('matrix')" data-cb="matrix" class="cb-opt p-2.5 rounded-xl border border-white/20 bg-slate-900 text-xs font-bold text-center">💚 Matrix</button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1.5">Arena Background</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" onclick="selectBgTheme('bg-nebula')" data-bg="bg-nebula" class="bg-opt p-2.5 rounded-xl border border-white/20 bg-slate-900 text-xs font-bold">Cosmic Nebula</button>
+            <button type="button" onclick="selectBgTheme('bg-abyss')" data-bg="bg-abyss" class="bg-opt p-2.5 rounded-xl border border-white/20 bg-slate-900 text-xs font-bold">Deep Cobalt</button>
+            <button type="button" onclick="selectBgTheme('bg-cyber')" data-bg="bg-cyber" class="bg-opt p-2.5 rounded-xl border border-white/20 bg-slate-900 text-xs font-bold">Emerald Grid</button>
+            <button type="button" onclick="selectBgTheme('bg-solar')" data-bg="bg-solar" class="bg-opt p-2.5 rounded-xl border border-white/20 bg-slate-900 text-xs font-bold">Solar Flare</button>
+          </div>
+        </div>
+
+        <button onclick="saveProfile()" class="w-full py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-sm active:scale-95">
+          Save Profile
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="modal-settings" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+    <div class="glass-panel max-w-md w-full rounded-3xl p-6 shadow-2xl">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-xl font-black text-white">Settings</h3>
+        <button onclick="closeModal('modal-settings')" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm font-bold">✕</button>
+      </div>
+
+      <div class="space-y-4 text-sm">
+        <div class="flex items-center justify-between">
+          <span class="font-bold">Sound Effects (SFX)</span>
+          <input id="set-sfx-enabled" type="checkbox" checked onchange="updateAudioSettings()" class="w-5 h-5 accent-indigo-500">
+        </div>
+        <div>
+          <div class="flex justify-between text-xs text-slate-300 mb-1">
+            <span>SFX Volume</span>
+            <span id="set-sfx-val">80%</span>
+          </div>
+          <input id="set-sfx-vol" type="range" min="0" max="100" value="80" oninput="updateAudioSettings()" class="w-full accent-indigo-500">
+        </div>
+
+        <div class="flex items-center justify-between pt-2 border-t border-white/10">
+          <span class="font-bold">Ambient Synth Music</span>
+          <input id="set-music-enabled" type="checkbox" checked onchange="updateAudioSettings()" class="w-5 h-5 accent-indigo-500">
+        </div>
+        <div>
+          <div class="flex justify-between text-xs text-slate-300 mb-1">
+            <span>Music Volume</span>
+            <span id="set-music-val">35%</span>
+          </div>
+          <input id="set-music-vol" type="range" min="0" max="100" value="35" oninput="updateAudioSettings()" class="w-full accent-indigo-500">
+        </div>
+
+        <div class="flex items-center justify-between pt-2 border-t border-white/10">
+          <div>
+            <div class="font-bold">Reduce Animations</div>
+            <div class="text-[11px] text-slate-400">Minimizes motion effects</div>
+          </div>
+          <input id="set-reduce-anim" type="checkbox" onchange="updateDisplaySettings()" class="w-5 h-5 accent-indigo-500">
+        </div>
+
+        <div class="pt-3 border-t border-white/10 flex justify-between items-center gap-2">
+          <button id="btn-reset-stats" onclick="confirmResetData()" class="px-3 py-2 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-bold hover:bg-rose-500/30">
+            Reset Stats
+          </button>
+          <div class="flex items-center gap-2">
+            <button onclick="openPwaInfoModal()" class="px-3 py-2 rounded-xl bg-indigo-500/20 border border-indigo-400/40 text-indigo-200 text-xs font-bold hover:bg-indigo-500/30">
+              📲 PWA Studio
+            </button>
+            <button onclick="closeModal('modal-settings')" class="px-4 py-2 rounded-xl bg-indigo-600 text-white font-bold text-xs">
+              Done
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rules Modal -->
+  <div id="modal-rules" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
+    <div class="glass-panel max-w-lg w-full rounded-3xl p-6 shadow-2xl my-auto max-h-[88vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-xl font-black text-white">Rules & Card Guide</h3>
+        <button onclick="closeModal('modal-rules')" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm font-bold">✕</button>
+      </div>
+      <div class="space-y-3 text-xs sm:text-sm text-slate-200 leading-relaxed">
+        <p><strong class="text-amber-300">Objective:</strong> Empty your hand first! Match the discard pile by <strong>Colour</strong>, <strong>Number</strong>, or <strong>Symbol</strong>, or play a <strong>Wild</strong> card.</p>
+
+        <div class="bg-slate-900/80 p-3 rounded-2xl border border-white/10 space-y-1.5">
+          <div class="font-extrabold text-indigo-300 uppercase text-xs">Colour-Blind Emblems</div>
+          <div class="grid grid-cols-2 gap-1.5 text-xs">
+            <div>🔥 <strong>Crimson</strong> — Flame</div>
+            <div>☀️ <strong>Gold</strong> — Sun</div>
+            <div>🍃 <strong>Emerald</strong> — Leaf</div>
+            <div>🌊 <strong>Cobalt</strong> — Wave</div>
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <div><strong class="text-rose-400">⊘ Skip (20 pts):</strong> Next player loses turn.</div>
+          <div><strong class="text-sky-400">⇄ Reverse (20 pts):</strong> Reverse direction (2-player: acts as Skip).</div>
+          <div><strong class="text-emerald-400">+2 Draw Two (20 pts):</strong> Next player draws 2 cards & skips.</div>
+          <div><strong class="text-purple-400">✦ Wild (50 pts):</strong> Play anytime, pick next colour.</div>
+          <div><strong class="text-amber-400">✦+4 Wild Draw Four (50 pts):</strong> Pick colour + next player draws 4 & skips. Legal only if holding no current colour cards (otherwise challengeable!).</div>
+        </div>
+
+        <p><strong class="text-pink-400">PRISM! Rule:</strong> When down to 1 card, press <strong>PRISM!</strong> before next turn begins. If caught, draw <strong>+2 penalty cards</strong>!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Modal -->
+  <div id="modal-stats" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
+    <div class="glass-panel max-w-lg w-full rounded-3xl p-6 shadow-2xl my-auto max-h-[88vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-xl font-black text-white">Career Stats & Medals</h3>
+        <button onclick="closeModal('modal-stats')" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm font-bold">✕</button>
+      </div>
+      <div id="stats-grid" class="grid grid-cols-3 gap-2.5 mb-5"></div>
+      <h4 class="text-xs font-extrabold uppercase tracking-wider text-amber-300 mb-2.5">Achievements</h4>
+      <div id="achievements-list" class="space-y-2"></div>
+    </div>
+  </div>
+
+  <!-- About Modal -->
+  <div id="modal-about" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+    <div class="glass-panel max-w-md w-full rounded-3xl p-6 shadow-2xl text-sm text-slate-200">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-xl font-black text-white">About PRISM CLASH</h3>
+        <button onclick="closeModal('modal-about')" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm font-bold">✕</button>
+      </div>
+      <p class="mb-3 text-xs sm:text-sm text-slate-300">
+        Original cosmic 108-card shedding game crafted with Web Audio synthesis and relative path PWA tooling for GitHub Pages.
+      </p>
+      <div class="bg-slate-900/80 p-3.5 rounded-2xl border border-white/10 text-xs space-y-1 mb-4">
+        <div class="font-bold text-indigo-300 mb-1">Standard 108-Card Deck:</div>
+        <div class="flex justify-between"><span>Number 0 (1/colour)</span><span class="font-bold">4 cards</span></div>
+        <div class="flex justify-between"><span>Numbers 1–9 (2/colour)</span><span class="font-bold">72 cards</span></div>
+        <div class="flex justify-between"><span>Skip, Reverse, +2 (2 each)</span><span class="font-bold">24 cards</span></div>
+        <div class="flex justify-between"><span>Wild & Wild +4 (4 each)</span><span class="font-bold">8 cards</span></div>
+        <div class="flex justify-between border-t border-white/10 pt-1 text-amber-300 font-extrabold"><span>Total Deck</span><span>108 cards</span></div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="closeModal('modal-about'); openPwaInfoModal();" class="flex-1 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs">
+          📲 PWA Studio & Files
+        </button>
+        <button onclick="closeModal('modal-about')" class="flex-1 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-xs">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GitHub Pages PWA Studio & Diagnostics Modal -->
+  <div id="modal-pwa" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
+    <div class="glass-panel max-w-2xl w-full rounded-3xl p-5 sm:p-6 shadow-2xl my-auto max-h-[90vh] overflow-y-auto text-xs sm:text-sm text-slate-200">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-xl font-black text-white flex items-center gap-2">
+          <span>📲</span> <span>GitHub Pages PWA Studio</span>
+        </h3>
+        <button onclick="closeModal('modal-pwa')" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm font-bold">✕</button>
+      </div>
+
+      <div id="pwa-origin-callout" class="p-3.5 rounded-2xl border mb-4 text-xs leading-relaxed">
+        <div id="pwa-origin-badge" class="font-black uppercase tracking-wider mb-1">Checking Origin...</div>
+        <p id="pwa-origin-explanation" class="text-slate-200"></p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-4 text-xs">
+        <div class="bg-slate-900/80 border border-white/10 rounded-2xl p-3">
+          <div class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Origin / Path</div>
+          <div id="pwa-diag-protocol" class="font-bold text-white mt-0.5 break-all"></div>
+        </div>
+        <div class="bg-slate-900/80 border border-white/10 rounded-2xl p-3">
+          <div class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Environment Type</div>
+          <div id="pwa-diag-origin-type" class="font-bold text-indigo-300 mt-0.5"></div>
+        </div>
+        <div class="bg-slate-900/80 border border-white/10 rounded-2xl p-3">
+          <div class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Display Mode</div>
+          <div id="pwa-diag-display" class="font-bold text-sky-300 mt-0.5"></div>
+        </div>
+        <div class="bg-slate-900/80 border border-white/10 rounded-2xl p-3">
+          <div class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Service Worker (./sw.js)</div>
+          <div id="pwa-diag-sw" class="font-bold text-amber-300 mt-0.5"></div>
+        </div>
+      </div>
+
+      <div class="bg-slate-900/80 border border-white/10 rounded-2xl p-3.5 mb-4 text-xs">
+        <div class="font-extrabold uppercase tracking-wider text-indigo-300 mb-2">GitHub Pages Subpath Folder Layout</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 font-mono text-[11px] text-slate-200">
+          <div class="flex items-center gap-2"><span class="text-emerald-400">✓</span> <span>./index.html</span></div>
+          <div class="flex items-center gap-2"><span class="text-emerald-400">✓</span> <span>./manifest.json</span></div>
+          <div class="flex items-center gap-2"><span class="text-emerald-400">✓</span> <span>./sw.js</span></div>
+          <div class="flex items-center gap-2"><span class="text-emerald-400">✓</span> <span>./icons/icon-192.png</span></div>
+          <div class="flex items-center gap-2"><span class="text-emerald-400">✓</span> <span>./icons/icon-512.png</span></div>
+        </div>
+      </div>
+
+      <div class="bg-slate-900/80 border border-white/10 rounded-2xl p-3.5 mb-4">
+        <div class="flex items-center justify-between gap-2 flex-wrap mb-2.5">
+          <span class="text-xs font-extrabold uppercase tracking-wider text-amber-300">Download Ready PWA Files</span>
+          <button type="button" onclick="downloadAllPwaFiles()" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black text-xs active:scale-95">
+            ⬇️ Download All PWA Files
+          </button>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <button type="button" onclick="downloadPwaFileByName('manifest')" class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/10 text-white font-bold text-xs active:scale-95">
+            📄 manifest.json
+          </button>
+          <button type="button" onclick="downloadPwaFileByName('sw')" class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/10 text-white font-bold text-xs active:scale-95">
+            ⚙️ sw.js
+          </button>
+          <button type="button" onclick="downloadPngIconAsset(192, 'icon-192.png', false)" class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/10 text-white font-bold text-xs active:scale-95">
+            🖼️ icon-192.png
+          </button>
+          <button type="button" onclick="downloadPngIconAsset(512, 'icon-512.png', true)" class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/10 text-white font-bold text-xs active:scale-95">
+            🖼️ icon-512.png
+          </button>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between gap-2 flex-wrap mb-2">
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <button id="tab-pwa-manifest" type="button" onclick="switchPwaCodeTab('manifest')" class="px-3 py-1.5 rounded-xl bg-indigo-600 text-white font-bold text-xs">manifest.json</button>
+          <button id="tab-pwa-sw" type="button" onclick="switchPwaCodeTab('sw')" class="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 font-bold text-xs">sw.js</button>
+          <button id="tab-pwa-deploy" type="button" onclick="switchPwaCodeTab('deploy')" class="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 font-bold text-xs">GitHub Deployment Guide</button>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <button type="button" onclick="downloadActivePwaFile()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 font-bold text-xs active:scale-95">
+            💾 Download
+          </button>
+          <button type="button" onclick="copyActivePwaSnippet()" class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs active:scale-95">
+            📋 Copy
+          </button>
+        </div>
+      </div>
+
+      <textarea id="pwa-code-preview" rows="7" readonly class="w-full rounded-2xl bg-slate-950 border border-white/15 p-3 font-mono text-[11px] text-emerald-200 focus:outline-none"></textarea>
+      <div id="pwa-copy-feedback" class="text-xs font-bold text-amber-300 mt-1.5 min-h-[18px]"></div>
+
+      <div class="flex items-center justify-between gap-2 mt-3">
+        <button id="btn-modal-install-now" type="button" onclick="triggerPwaInstall()" class="hidden px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs active:scale-95">
+          📲 Install App Now
+        </button>
+        <button type="button" onclick="closeModal('modal-pwa')" class="ml-auto px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs active:scale-95">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ============================================================================
+   1. PROCEDURAL WEB AUDIO ENGINE (SFX & AMBIENT SYNTH MUSIC)
+============================================================================ */
+class PrismAudioEngine {
+  constructor() {
+    this.ctx = null;
+    this.muted = false;
+    this.sfxEnabled = true;
+    this.musicEnabled = true;
+    this.sfxVol = 0.8;
+    this.musicVol = 0.35;
+    this.musicTimer = null;
+    this.stepIndex = 0;
+  }
+
+  unlock() {
+    if (!this.ctx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtx) {
+        this.ctx = new AudioCtx();
+      }
+    }
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume().catch(() => {});
+    }
+    if (this.musicEnabled && !this.muted && !this.musicTimer) {
+      this.startMusicLoop();
+    }
+  }
+
+  playTone(freq, type = 'sine', duration = 0.15, volScale = 1, slideTo = null, delay = 0) {
+    if (this.muted || !this.sfxEnabled || this.sfxVol <= 0) return;
+    this.unlock();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime + delay;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, now);
+    if (slideTo) {
+      osc.frequency.exponentialRampToValueAtTime(Math.max(20, slideTo), now + duration);
+    }
+
+    const peak = Math.min(0.45, 0.25 * this.sfxVol * volScale);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.linearRampToValueAtTime(peak, now + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + duration + 0.02);
+  }
+
+  playNoise(duration = 0.12, volScale = 0.6, delay = 0) {
+    if (this.muted || !this.sfxEnabled || this.sfxVol <= 0) return;
+    this.unlock();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime + delay;
+    const bufferSize = Math.floor(this.ctx.sampleRate * duration);
+    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.45));
+    }
+
+    const noise = this.ctx.createBufferSource();
+    noise.buffer = buffer;
+
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(1400, now);
+
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.22 * this.sfxVol * volScale, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.ctx.destination);
+    noise.start(now);
+  }
+
+  play(event) {
+    switch (event) {
+      case 'click':
+        this.playTone(620, 'triangle', 0.06, 0.6, 480);
+        break;
+      case 'start':
+        this.playTone(330, 'triangle', 0.14, 0.8, 440, 0);
+        this.playTone(440, 'triangle', 0.14, 0.8, 554, 0.09);
+        this.playTone(659, 'sine', 0.28, 0.9, 880, 0.18);
+        break;
+      case 'deal':
+        this.playNoise(0.07, 0.7);
+        this.playTone(500, 'sine', 0.05, 0.3, 350);
+        break;
+      case 'draw':
+        this.playNoise(0.09, 0.8);
+        this.playTone(340, 'triangle', 0.1, 0.6, 520);
+        break;
+      case 'play':
+        this.playNoise(0.08, 0.75);
+        this.playTone(420, 'sine', 0.11, 0.7, 680);
+        break;
+      case 'invalid':
+        this.playTone(175, 'sawtooth', 0.12, 0.7, 130, 0);
+        this.playTone(150, 'sawtooth', 0.14, 0.7, 110, 0.08);
+        break;
+      case 'shuffle':
+        for (let i = 0; i < 4; i++) {
+          this.playNoise(0.06, 0.65, i * 0.055);
+        }
+        break;
+      case 'skip':
+        this.playTone(740, 'sine', 0.18, 0.85, 220);
+        break;
+      case 'reverse':
+        this.playTone(280, 'triangle', 0.14, 0.8, 620, 0);
+        this.playTone(620, 'triangle', 0.14, 0.8, 280, 0.12);
+        break;
+      case 'draw2':
+        this.playTone(260, 'sawtooth', 0.14, 0.75, 190, 0);
+        this.playTone(220, 'sawtooth', 0.18, 0.85, 150, 0.13);
+        break;
+      case 'wild':
+        [523, 659, 784, 1046].forEach((f, idx) => {
+          this.playTone(f, 'sine', 0.18, 0.65, null, idx * 0.055);
+        });
+        break;
+      case 'draw4':
+        this.playTone(190, 'sawtooth', 0.22, 0.9, 95, 0);
+        [440, 554, 659, 880].forEach((f, idx) => {
+          this.playTone(f, 'triangle', 0.16, 0.6, null, 0.08 + idx * 0.05);
+        });
+        break;
+      case 'prism':
+        this.playTone(587.33, 'triangle', 0.14, 0.95, null, 0);
+        this.playTone(880, 'sine', 0.32, 1.0, 932, 0.11);
+        break;
+      case 'catch':
+        this.playTone(680, 'square', 0.1, 0.7, 420, 0);
+        this.playTone(420, 'square', 0.18, 0.75, 260, 0.1);
+        break;
+      case 'challengeWin':
+        [523, 659, 784, 1046].forEach((f, i) => this.playTone(f, 'triangle', 0.16, 0.85, null, i * 0.08));
+        break;
+      case 'challengeLose':
+        [330, 277, 220, 165].forEach((f, i) => this.playTone(f, 'sawtooth', 0.18, 0.75, null, i * 0.09));
+        break;
+      case 'victory':
+        [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5].forEach((f, i) => {
+          this.playTone(f, 'triangle', i === 5 ? 0.45 : 0.15, 0.95, null, i * 0.11);
+        });
+        break;
+      case 'defeat':
+        [392, 349.23, 329.63, 261.63].forEach((f, i) => {
+          this.playTone(f, 'sine', 0.26, 0.8, null, i * 0.16);
+        });
+        break;
+    }
+  }
+
+  startMusicLoop() {
+    if (this.musicTimer) return;
+    const scale = [261.63, 311.13, 392.00, 466.16, 523.25, 392.00, 311.13, 349.23];
+    this.musicTimer = setInterval(() => {
+      if (this.muted || !this.musicEnabled || this.musicVol <= 0 || !this.ctx || this.ctx.state !== 'running') return;
+      const freq = scale[this.stepIndex % scale.length];
+      this.stepIndex++;
+
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now);
+
+      const vol = 0.06 * this.musicVol;
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.linearRampToValueAtTime(vol, now + 0.08);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.55);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.6);
+    }, 620);
+  }
+}
+
+const audio = new PrismAudioEngine();
+document.addEventListener('pointerdown', () => audio.unlock(), { once: true });
+
+/* ============================================================================
+   2. PERSISTENT DATA, STATS & ACHIEVEMENTS
+============================================================================ */
+const AVATARS = ['🚀', '👾', '🦊', '🐱', '🐉', '🤖', '🦄', '🐼', '🦁', '🐙', '🧙', '👑'];
+const AI_PROFILES = [
+  { name: 'Vega', avatar: '🤖' },
+  { name: 'Orion', avatar: '👾' },
+  { name: 'Lyra', avatar: '🦊' },
+  { name: 'Draco', avatar: '🐉' },
+  { name: 'Astra', avatar: '🧙' }
+];
+
+const DEFAULT_DATA = {
+  profile: { name: 'Nova', avatar: '🚀', cardBack: 'prism', bgTheme: 'bg-nebula' },
+  settings: { muted: false, sfxEnabled: true, musicEnabled: true, sfxVol: 80, musicVol: 35, reduceAnim: false },
+  stats: { gamesPlayed: 0, gamesWon: 0, gamesLost: 0, highScore: 0, cardsPlayed: 0, prismCalls: 0, challengesWon: 0, challengesLost: 0, currentStreak: 0, bestStreak: 0 },
+  achievements: { firstWin: false, prismMaster: false, bluffBuster: false, highScorer: false, streak3: false, cardShark: false }
+};
+
+const ACHIEVEMENT_DEFS = [
+  { id: 'firstWin', icon: '🏅', title: 'Cosmic Debut', desc: 'Win your first match of PRISM CLASH.' },
+  { id: 'prismMaster', icon: '✦', title: 'Prism Caller', desc: 'Successfully declare PRISM! 5 times.' },
+  { id: 'bluffBuster', icon: '🔍', title: 'Truth Seeker', desc: 'Win a Wild +4 Challenge against an opponent.' },
+  { id: 'highScorer', icon: '💎', title: 'Star Collector', desc: 'Reach 500+ total points in a match.' },
+  { id: 'streak3', icon: '🔥', title: 'Supernova Streak', desc: 'Win 3 matches in a row.' },
+  { id: 'cardShark', icon: '🃏', title: 'Prism Veteran', desc: 'Play 100 cards across your career.' }
+];
+
+let userData = loadUserData();
+
+function loadUserData() {
+  try {
+    const raw = localStorage.getItem('prism_clash_save_v1');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      return {
+        profile: { ...DEFAULT_DATA.profile, ...(parsed.profile || {}) },
+        settings: { ...DEFAULT_DATA.settings, ...(parsed.settings || {}) },
+        stats: { ...DEFAULT_DATA.stats, ...(parsed.stats || {}) },
+        achievements: { ...DEFAULT_DATA.achievements, ...(parsed.achievements || {}) }
+      };
+    }
+  } catch (e) {}
+  return JSON.parse(JSON.stringify(DEFAULT_DATA));
+}
+
+function saveUserData() {
+  try {
+    localStorage.setItem('prism_clash_save_v1', JSON.stringify(userData));
+  } catch (e) {}
+}
+
+function applySavedPreferences() {
+  document.body.className = `game-bg ${userData.profile.bgTheme} ${userData.settings.reduceAnim ? 'no-anim' : ''} select-none`;
+  document.getElementById('menu-player-name').textContent = userData.profile.name;
+  document.getElementById('menu-player-avatar').textContent = userData.profile.avatar;
+
+  audio.muted = userData.settings.muted;
+  audio.sfxEnabled = userData.settings.sfxEnabled;
+  audio.musicEnabled = userData.settings.musicEnabled;
+  audio.sfxVol = userData.settings.sfxVol / 100;
+  audio.musicVol = userData.settings.musicVol / 100;
+
+  document.getElementById('btn-quick-mute').textContent = audio.muted ? '🔇' : '🔊';
+  document.getElementById('btn-game-mute').textContent = audio.muted ? '🔇' : '🔊';
+
+  document.getElementById('set-sfx-enabled').checked = userData.settings.sfxEnabled;
+  document.getElementById('set-music-enabled').checked = userData.settings.musicEnabled;
+  document.getElementById('set-sfx-vol').value = userData.settings.sfxVol;
+  document.getElementById('set-music-vol').value = userData.settings.musicVol;
+  document.getElementById('set-sfx-val').textContent = userData.settings.sfxVol + '%';
+  document.getElementById('set-music-val').textContent = userData.settings.musicVol + '%';
+  document.getElementById('set-reduce-anim').checked = userData.settings.reduceAnim;
+}
+
+function checkAchievements() {
+  const s = userData.stats;
+  const a = userData.achievements;
+  if (s.gamesWon >= 1) a.firstWin = true;
+  if (s.prismCalls >= 5) a.prismMaster = true;
+  if (s.challengesWon >= 1) a.bluffBuster = true;
+  if (s.highScore >= 500) a.highScorer = true;
+  if (s.bestStreak >= 3) a.streak3 = true;
+  if (s.cardsPlayed >= 100) a.cardShark = true;
+  saveUserData();
+}
+
+/* ============================================================================
+   3. CARD & DECK ENGINE (STANDARD 108 CARDS)
+============================================================================ */
+const COLORS = ['red', 'yellow', 'green', 'blue'];
+const COLOR_META = {
+  red: { name: 'CRIMSON', icon: '🔥', cls: 'card-red', orbBg: 'bg-rose-600' },
+  yellow: { name: 'GOLD', icon: '☀️', cls: 'card-yellow', orbBg: 'bg-amber-500' },
+  green: { name: 'EMERALD', icon: '🍃', cls: 'card-green', orbBg: 'bg-emerald-600' },
+  blue: { name: 'COBALT', icon: '🌊', cls: 'card-blue', orbBg: 'bg-blue-600' },
+  wild: { name: 'PRISM', icon: '✦', cls: 'card-wild', orbBg: 'bg-purple-600' }
+};
+
+let cardUidCounter = 1;
+
+function createOfficialDeck() {
+  const deck = [];
+  for (const color of COLORS) {
+    deck.push({ uid: cardUidCounter++, color, type: 'number', value: 0, points: 0 });
+    for (let n = 1; n <= 9; n++) {
+      deck.push({ uid: cardUidCounter++, color, type: 'number', value: n, points: n });
+      deck.push({ uid: cardUidCounter++, color, type: 'number', value: n, points: n });
+    }
+    for (let i = 0; i < 2; i++) {
+      deck.push({ uid: cardUidCounter++, color, type: 'skip', value: 'skip', points: 20 });
+      deck.push({ uid: cardUidCounter++, color, type: 'reverse', value: 'reverse', points: 20 });
+      deck.push({ uid: cardUidCounter++, color, type: 'draw2', value: 'draw2', points: 20 });
+    }
+  }
+  for (let i = 0; i < 4; i++) {
+    deck.push({ uid: cardUidCounter++, color: 'wild', type: 'wild', value: 'wild', points: 50 });
+    deck.push({ uid: cardUidCounter++, color: 'wild', type: 'wild4', value: 'wild4', points: 50 });
+  }
+  return shuffleArray(deck);
+}
+
+function shuffleArray(arr) {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function getCardDisplaySymbol(card) {
+  if (card.type === 'number') return String(card.value);
+  if (card.type === 'skip') return '⊘';
+  if (card.type === 'reverse') return '⇄';
+  if (card.type === 'draw2') return '+2';
+  if (card.type === 'wild') return '✦';
+  if (card.type === 'wild4') return '+4';
+  return '?';
+}
+
+function getCardCornerBadge(card) {
+  if (card.color === 'wild') return '✦';
+  return COLOR_META[card.color].icon;
+}
+
+function renderCardHTML(card, extraClasses = '', clickableAttr = '') {
+  const meta = COLOR_META[card.color];
+  const sym = getCardDisplaySymbol(card);
+  const badge = getCardCornerBadge(card);
+  const textColor = card.color === 'yellow' ? 'text-slate-950' : 'text-white';
+  const centerSize = sym.length > 1 ? 'text-3xl sm:text-4xl' : 'text-4xl sm:text-5xl';
+
+  return `
+    <div ${clickableAttr} class="prism-card ${meta.cls} ${extraClasses} flex flex-col justify-between p-1.5 sm:p-2 select-none">
+      <div class="card-inner-oval"></div>
+      <div class="relative z-10 flex items-center justify-between leading-none">
+        <span class="font-black text-xs sm:text-sm ${card.color === 'wild' ? 'text-white' : textColor} drop-shadow">${sym}</span>
+        <span class="text-[10px] sm:text-xs">${badge}</span>
+      </div>
+      <div class="relative z-10 my-auto flex flex-col items-center justify-center">
+        <span class="font-black ${centerSize} text-white text-stroke tracking-tighter leading-none">${sym}</span>
+        ${card.type === 'wild4' ? '<span class="text-[9px] font-black uppercase tracking-widest text-amber-300 mt-0.5">WILD</span>' : ''}
+        ${card.type === 'wild' ? '<span class="text-[9px] font-black uppercase tracking-widest text-sky-300 mt-0.5">PRISM</span>' : ''}
+      </div>
+      <div class="relative z-10 flex items-center justify-between leading-none rotate-180">
+        <span class="font-black text-xs sm:text-sm ${card.color === 'wild' ? 'text-white' : textColor} drop-shadow">${sym}</span>
+        <span class="text-[10px] sm:text-xs">${badge}</span>
+      </div>
+    </div>
+  `;
+}
+
+/* ============================================================================
+   4. GAME STATE & ENGINE
+============================================================================ */
+let gameState = null;
+let aiTimeout = null;
+let resetConfirmArmed = false;
+
+function buildDefaultConfig() {
+  return {
+    modeName: 'Classic',
+    playerCount: 4,
+    opponentType: 'ai',
+    aiDifficulty: 'medium',
+    handSize: 7,
+    scoreTarget: 500,
+    houseRules: { stacking: false, sevenZero: false, jumpIn: false, drawUntil: false }
+  };
+}
+
+function startQuickPlay() {
+  audio.play('start');
+  initMatch(buildDefaultConfig());
+}
+
+function launchPresetMode(preset) {
+  audio.play('start');
+  closeModal('modal-modes');
+  const cfg = buildDefaultConfig();
+  if (preset === 'quick') {
+    cfg.modeName = 'Quick Blitz';
+    cfg.playerCount = 2;
+    cfg.handSize = 5;
+    cfg.scoreTarget = 0;
+  } else if (preset === 'challenge') {
+    cfg.modeName = 'Challenge';
+    cfg.aiDifficulty = 'hard';
+  } else if (preset === 'practice') {
+    cfg.modeName = 'Practice';
+    cfg.aiDifficulty = 'easy';
+    cfg.scoreTarget = 0;
+  } else if (preset === 'local') {
+    cfg.modeName = 'Pass & Play';
+    cfg.playerCount = 2;
+    cfg.opponentType = 'local';
+    cfg.scoreTarget = 200;
+  }
+  initMatch(cfg);
+}
+
+function openCustomMatch() {
+  audio.play('click');
+  openModal('modal-custom');
+}
+
+function startCustomMatch() {
+  audio.play('start');
+  closeModal('modal-custom');
+  const cfg = {
+    modeName: 'Custom',
+    playerCount: parseInt(document.getElementById('cfg-player-count').value, 10),
+    opponentType: document.getElementById('cfg-opponent-type').value,
+    aiDifficulty: document.getElementById('cfg-ai-diff').value,
+    handSize: parseInt(document.getElementById('cfg-hand-size').value, 10),
+    scoreTarget: parseInt(document.getElementById('cfg-score-target').value, 10),
+    houseRules: {
+      stacking: document.getElementById('hr-stacking').checked,
+      sevenZero: document.getElementById('hr-seven-zero').checked,
+      jumpIn: document.getElementById('hr-jump-in').checked,
+      drawUntil: document.getElementById('hr-draw-until').checked
+    }
+  };
+  initMatch(cfg);
+}
+
+function initMatch(config) {
+  clearTimeout(aiTimeout);
+  stopConfetti();
+
+  const players = [];
+  players.push({ id: 0, name: userData.profile.name || 'Player 1', avatar: userData.profile.avatar || '🚀', isHuman: true, hand: [], score: 0, calledPrism: false });
+
+  for (let i = 1; i < config.playerCount; i++) {
+    if (config.opponentType === 'local') {
+      players.push({ id: i, name: `Player ${i + 1}`, avatar: AVATARS[(i + 2) % AVATARS.length], isHuman: true, hand: [], score: 0, calledPrism: false });
+    } else {
+      const aiMeta = AI_PROFILES[(i - 1) % AI_PROFILES.length];
+      players.push({ id: i, name: `${aiMeta.name}`, avatar: aiMeta.avatar, isHuman: false, hand: [], score: 0, calledPrism: false });
+    }
+  }
+
+  gameState = {
+    config, players, round: 1, deck: [], discard: [], currentPlayer: 0, direction: 1,
+    activeColor: 'red', pendingDrawCount: 0, pendingDrawType: null, hasDrawnThisTurn: false,
+    drawnPlayableCardUid: null, inputLocked: false, paused: false, privacyCurtainActive: false, lastWild4Context: null
+  };
+
+  showScreen('screen-game');
+  startRound();
+}
+
+function startRound() {
+  clearTimeout(aiTimeout);
+  stopConfetti();
+
+  const gs = gameState;
+  gs.deck = createOfficialDeck();
+  gs.discard = [];
+  gs.direction = 1;
+  gs.pendingDrawCount = 0;
+  gs.pendingDrawType = null;
+  gs.hasDrawnThisTurn = false;
+  gs.drawnPlayableCardUid = null;
+  gs.inputLocked = false;
+  gs.paused = false;
+  gs.lastWild4Context = null;
+
+  gs.players.forEach(p => {
+    p.hand = [];
+    p.calledPrism = false;
+    for (let c = 0; c < gs.config.handSize; c++) {
+      p.hand.push(drawFromDeckInternal());
+    }
+  });
+
+  let starter = drawFromDeckInternal();
+  while (starter.type === 'wild4') {
+    gs.deck.unshift(starter);
+    gs.deck = shuffleArray(gs.deck);
+    starter = drawFromDeckInternal();
+  }
+  gs.discard.push(starter);
+
+  gs.currentPlayer = Math.floor(Math.random() * gs.players.length);
+  gs.activeColor = starter.color === 'wild' ? COLORS[Math.floor(Math.random() * 4)] : starter.color;
+
+  if (starter.type === 'reverse') {
+    gs.direction = -1;
+    if (gs.players.length === 2) gs.currentPlayer = getNextPlayerIndex(gs.currentPlayer, 1);
+  } else if (starter.type === 'skip') {
+    gs.currentPlayer = getNextPlayerIndex(gs.currentPlayer, 1);
+  } else if (starter.type === 'draw2') {
+    const victim = gs.players[gs.currentPlayer];
+    victim.hand.push(drawFromDeckInternal(), drawFromDeckInternal());
+    gs.currentPlayer = getNextPlayerIndex(gs.currentPlayer, 1);
+  }
+
+  audio.play('shuffle');
+  updateHUDLabels();
+  renderAll();
+
+  if (gs.config.opponentType === 'local') showPassDeviceCurtain(gs.currentPlayer);
+  else beginTurn();
+}
+
+function drawFromDeckInternal() {
+  const gs = gameState;
+  if (gs.deck.length === 0) {
+    if (gs.discard.length <= 1) {
+      gs.deck = createOfficialDeck();
+    } else {
+      const top = gs.discard.pop();
+      gs.deck = shuffleArray(gs.discard);
+      gs.discard = [top];
+      audio.play('shuffle');
+      showFloatingBanner('DECK RESHUFFLED!', 'from-indigo-500 to-sky-500');
+    }
+  }
+  return gs.deck.pop();
+}
+
+function getNextPlayerIndex(fromIdx, steps = 1) {
+  const n = gameState.players.length;
+  return (((fromIdx + gameState.direction * steps) % n) + n) % n;
+}
+
+function getTopDiscard() {
+  return gameState.discard[gameState.discard.length - 1];
+}
+
+function isCardPlayable(card, playerIdx = gameState.currentPlayer) {
+  const gs = gameState;
+  const top = getTopDiscard();
+  if (!top) return true;
+
+  if (gs.pendingDrawCount > 0 && gs.config.houseRules.stacking) {
+    if (gs.pendingDrawType === 'draw2' && card.type === 'draw2') return true;
+    if (gs.pendingDrawType === 'wild4' && card.type === 'wild4') return true;
+    return false;
+  }
+
+  if (playerIdx === gs.currentPlayer && gs.hasDrawnThisTurn && gs.drawnPlayableCardUid !== null) {
+    return card.uid === gs.drawnPlayableCardUid;
+  }
+
+  if (card.color === 'wild') return true;
+  if (card.color === gs.activeColor) return true;
+  if (card.type === 'number' && top.type === 'number' && card.value === top.value) return true;
+  if (card.type !== 'number' && card.type === top.type) return true;
+
+  return false;
+}
+
+function canJumpIn(card) {
+  if (!gameState.config.houseRules.jumpIn) return false;
+  if (gameState.pendingDrawCount > 0) return false;
+  const top = getTopDiscard();
+  if (!top || card.color === 'wild') return false;
+  return card.color === top.color && card.type === top.type && card.value === top.value;
+}
+
+function getViewingHumanIndex() {
+  const gs = gameState;
+  if (gs.config.opponentType === 'local') return gs.currentPlayer;
+  return 0;
+}
+
+/* ============================================================================
+   5. GAMEPLAY LOGIC & ACTIONS
+============================================================================ */
+function beginTurn() {
+  const gs = gameState;
+  if (!gs || gs.paused) return;
+
+  gs.hasDrawnThisTurn = false;
+  gs.drawnPlayableCardUid = null;
+  gs.inputLocked = false;
+
+  const curr = gs.players[gs.currentPlayer];
+
+  if (gs.pendingDrawCount > 0) {
+    const canStack = gs.config.houseRules.stacking && curr.hand.some(c => isCardPlayable(c, gs.currentPlayer));
+    if (!canStack) {
+      const count = gs.pendingDrawCount;
+      for (let i = 0; i < count; i++) curr.hand.push(drawFromDeckInternal());
+      curr.calledPrism = false;
+      audio.play('draw2');
+      showFloatingBanner(`${curr.name} DRAWS +${count}!`, 'from-rose-600 to-amber-600');
+      gs.pendingDrawCount = 0;
+      gs.pendingDrawType = null;
+      gs.currentPlayer = getNextPlayerIndex(gs.currentPlayer, 1);
+      renderAll();
+      setTimeout(() => {
+        if (gs.config.opponentType === 'local') showPassDeviceCurtain(gs.currentPlayer);
+        else beginTurn();
+      }, 700);
+      return;
+    }
+  }
+
+  renderAll();
+
+  if (!curr.isHuman) {
+    gs.inputLocked = true;
+    aiTimeout = setTimeout(() => executeAITurn(), gs.config.modeName === 'Quick Blitz' ? 550 : 950);
+  }
+}
+
+function handleHumanCardClick(cardUid) {
+  const gs = gameState;
+  if (!gs || gs.paused || gs.inputLocked || gs.privacyCurtainActive) return;
+
+  const viewIdx = getViewingHumanIndex();
+  const player = gs.players[viewIdx];
+  const cardIdx = player.hand.findIndex(c => c.uid === cardUid);
+  if (cardIdx === -1) return;
+  const card = player.hand[cardIdx];
+
+  const isTurn = gs.currentPlayer === viewIdx;
+  const jumpInValid = !isTurn && gs.config.opponentType === 'ai' && canJumpIn(card);
+
+  if (!isTurn && !jumpInValid) {
+    audio.play('invalid');
+    shakeCardElement(cardUid);
+    return;
+  }
+
+  if (jumpInValid) {
+    gs.currentPlayer = viewIdx;
+    showFloatingBanner('⚡ JUMP-IN!', 'from-amber-400 to-rose-500');
+  }
+
+  if (!isCardPlayable(card, viewIdx)) {
+    audio.play('invalid');
+    shakeCardElement(cardUid);
+    return;
+  }
+
+  userData.stats.cardsPlayed++;
+  checkAchievements();
+  playCardFromHand(viewIdx, cardIdx);
+}
+
+function shakeCardElement(uid) {
+  const el = document.querySelector(`[data-card-uid="${uid}"]`);
+  if (el) {
+    el.classList.remove('shake-invalid');
+    void el.offsetWidth;
+    el.classList.add('shake-invalid');
+  }
+}
+
+function playCardFromHand(playerIdx, cardIdx, chosenWildColor = null, chosenSwapTarget = null) {
+  const gs = gameState;
+  gs.inputLocked = true;
+  document.getElementById('post-draw-bar').classList.add('hidden');
+
+  const player = gs.players[playerIdx];
+  const prevColor = gs.activeColor;
+  const hadMatchingColorBeforePlay = player.hand.some(c => c.color === prevColor);
+
+  const [card] = player.hand.splice(cardIdx, 1);
+  gs.discard.push(card);
+
+  if (player.hand.length > 1) {
+    player.calledPrism = false;
+  } else if (player.hand.length === 1 && !player.isHuman) {
+    const forgetChance = gs.config.aiDifficulty === 'easy' ? 0.45 : gs.config.aiDifficulty === 'medium' ? 0.18 : 0.03;
+    if (Math.random() > forgetChance) {
+      player.calledPrism = true;
+      audio.play('prism');
+      showFloatingBanner(`${player.name}: PRISM!`, 'from-rose-500 via-amber-400 to-sky-500');
+    } else {
+      player.calledPrism = false;
+    }
+  }
+
+  if (card.color !== 'wild') gs.activeColor = card.color;
+
+  if (card.type === 'skip') audio.play('skip');
+  else if (card.type === 'reverse') audio.play('reverse');
+  else if (card.type === 'draw2') audio.play('draw2');
+  else if (card.type === 'wild') audio.play('wild');
+  else if (card.type === 'wild4') audio.play('draw4');
+  else audio.play('play');
+
+  renderAll();
+
+  if ((card.type === 'wild' || card.type === 'wild4') && !chosenWildColor) {
+    gs.pendingWildCard = { playerIdx, card, prevColor, hadMatchingColorBeforePlay };
+    openModal('modal-color-picker');
+    return;
+  }
+
+  if (chosenWildColor) gs.activeColor = chosenWildColor;
+
+  if (gs.config.houseRules.sevenZero && card.type === 'number' && player.hand.length > 0) {
+    if (card.value === 0) {
+      rotateAllHands();
+      showFloatingBanner('0-RULE: HANDS ROTATED!', 'from-indigo-500 to-emerald-500');
+    } else if (card.value === 7) {
+      if (player.isHuman && chosenSwapTarget === null) {
+        gs.pendingSwapContext = { playerIdx, card };
+        openSwapTargetModal(playerIdx);
+        return;
+      } else {
+        const targetIdx = chosenSwapTarget !== null ? chosenSwapTarget : chooseBestAISwapTarget(playerIdx);
+        swapPlayerHands(playerIdx, targetIdx);
+        showFloatingBanner(`7-RULE: SWAPPED WITH ${gs.players[targetIdx].name}!`, 'from-amber-500 to-pink-500');
+      }
+    }
+  }
+
+  finalizeCardEffects(playerIdx, card, prevColor, hadMatchingColorBeforePlay);
+}
+
+function selectWildColor(color) {
+  audio.play('wild');
+  closeModal('modal-color-picker');
+  const ctx = gameState.pendingWildCard;
+  gameState.pendingWildCard = null;
+  gameState.activeColor = color;
+  renderAll();
+  finalizeCardEffects(ctx.playerIdx, ctx.card, ctx.prevColor, ctx.hadMatchingColorBeforePlay);
+}
+
+function openSwapTargetModal(fromIdx) {
+  const list = document.getElementById('swap-targets-list');
+  list.innerHTML = '';
+  gameState.players.forEach((p, idx) => {
+    if (idx === fromIdx) return;
+    const btn = document.createElement('button');
+    btn.className = 'w-full p-3 rounded-2xl bg-slate-800 hover:bg-indigo-600 text-white font-bold flex items-center justify-between transition';
+    btn.innerHTML = `<span>${p.avatar} ${p.name}</span><span class="text-xs bg-black/40 px-2.5 py-1 rounded-full">${p.hand.length} cards</span>`;
+    btn.onclick = () => {
+      closeModal('modal-swap-target');
+      const ctx = gameState.pendingSwapContext;
+      gameState.pendingSwapContext = null;
+      swapPlayerHands(ctx.playerIdx, idx);
+      showFloatingBanner(`SWAPPED HANDS WITH ${p.name}!`, 'from-amber-500 to-pink-500');
+      finalizeCardEffects(ctx.playerIdx, ctx.card, gameState.activeColor, false);
+    };
+    list.appendChild(btn);
+  });
+  openModal('modal-swap-target');
+}
+
+function rotateAllHands() {
+  const gs = gameState;
+  const n = gs.players.length;
+  const hands = gs.players.map(p => p.hand);
+  for (let i = 0; i < n; i++) {
+    const from = (((i - gs.direction) % n) + n) % n;
+    gs.players[i].hand = hands[from];
+  }
+}
+
+function swapPlayerHands(idxA, idxB) {
+  const temp = gameState.players[idxA].hand;
+  gameState.players[idxA].hand = gameState.players[idxB].hand;
+  gameState.players[idxB].hand = temp;
+}
+
+function finalizeCardEffects(playerIdx, card, prevColor, hadMatchingColorBeforePlay) {
+  const gs = gameState;
+  const player = gs.players[playerIdx];
+
+  if (player.hand.length === 0) {
+    if (card.type === 'draw2' || card.type === 'wild4') {
+      const victimIdx = getNextPlayerIndex(playerIdx, 1);
+      const penalty = card.type === 'draw2' ? 2 : 4;
+      for (let i = 0; i < penalty; i++) gs.players[victimIdx].hand.push(drawFromDeckInternal());
+    }
+    handleRoundWin(playerIdx);
+    return;
+  }
+
+  let stepAdvance = 1;
+
+  if (card.type === 'skip') {
+    const skipped = gs.players[getNextPlayerIndex(playerIdx, 1)];
+    showFloatingBanner(`⊘ ${skipped.name} SKIPPED!`, 'from-rose-500 to-orange-500');
+    stepAdvance = 2;
+  } else if (card.type === 'reverse') {
+    gs.direction *= -1;
+    showFloatingBanner('⇄ REVERSED!', 'from-sky-500 to-indigo-500');
+    if (gs.players.length === 2) stepAdvance = 2;
+  } else if (card.type === 'draw2') {
+    if (gs.config.houseRules.stacking) {
+      gs.pendingDrawCount += 2;
+      gs.pendingDrawType = 'draw2';
+      showFloatingBanner(`+2 STACKED (${gs.pendingDrawCount})!`, 'from-rose-600 to-amber-500');
+    } else {
+      const victim = gs.players[getNextPlayerIndex(playerIdx, 1)];
+      victim.hand.push(drawFromDeckInternal(), drawFromDeckInternal());
+      victim.calledPrism = false;
+      showFloatingBanner(`${victim.name} +2 & SKIPPED!`, 'from-rose-600 to-amber-500');
+      stepAdvance = 2;
+    }
+  } else if (card.type === 'wild4') {
+    const nextIdx = getNextPlayerIndex(playerIdx, 1);
+    const nextPlayer = gs.players[nextIdx];
+
+    if (gs.config.houseRules.stacking) {
+      gs.pendingDrawCount += 4;
+      gs.pendingDrawType = 'wild4';
+      showFloatingBanner(`+4 STACKED (${gs.pendingDrawCount})!`, 'from-purple-600 to-rose-600');
+    } else {
+      gs.lastWild4Context = { attackerIdx: playerIdx, victimIdx: nextIdx, prevColor, hadMatchingColor: hadMatchingColorBeforePlay };
+
+      if (nextPlayer.isHuman) {
+        gs.currentPlayer = nextIdx;
+        renderAll();
+        if (gs.config.opponentType === 'local') {
+          showPassDeviceCurtain(nextIdx, () => promptHumanWild4Challenge());
+        } else {
+          promptHumanWild4Challenge();
+        }
+        return;
+      } else {
+        const aiChallenges = decideAIWild4Challenge(nextIdx);
+        if (aiChallenges) {
+          resolveWild4ChallengeOutcome(true);
+          return;
+        } else {
+          nextPlayer.hand.push(drawFromDeckInternal(), drawFromDeckInternal(), drawFromDeckInternal(), drawFromDeckInternal());
+          nextPlayer.calledPrism = false;
+          showFloatingBanner(`${nextPlayer.name} +4 & SKIPPED!`, 'from-purple-600 to-rose-600');
+          stepAdvance = 2;
+        }
+      }
+    }
+  }
+
+  gs.currentPlayer = getNextPlayerIndex(playerIdx, stepAdvance);
+  renderAll();
+
+  setTimeout(() => {
+    if (gs.config.opponentType === 'local') showPassDeviceCurtain(gs.currentPlayer);
+    else beginTurn();
+  }, 600);
+}
+
+function promptHumanWild4Challenge() {
+  const ctx = gameState.lastWild4Context;
+  const attacker = gameState.players[ctx.attackerIdx];
+  document.getElementById('challenge-title').textContent = `${attacker.name} Played Wild +4!`;
+  document.getElementById('challenge-desc').textContent =
+    `Previous colour was ${COLOR_META[ctx.prevColor].name}. Challenge if you think ${attacker.name} held a ${COLOR_META[ctx.prevColor].name} card!`;
+  openModal('modal-challenge');
+}
+
+function resolveHumanChallenge(didChallenge) {
+  closeModal('modal-challenge');
+  resolveWild4ChallengeOutcome(didChallenge);
+}
+
+function resolveWild4ChallengeOutcome(didChallenge) {
+  const gs = gameState;
+  const ctx = gs.lastWild4Context;
+  gs.lastWild4Context = null;
+
+  const attacker = gs.players[ctx.attackerIdx];
+  const victim = gs.players[ctx.victimIdx];
+
+  if (!didChallenge) {
+    for (let i = 0; i < 4; i++) victim.hand.push(drawFromDeckInternal());
+    victim.calledPrism = false;
+    audio.play('draw4');
+    showFloatingBanner(`${victim.name} DRAWS +4 & SKIPS!`, 'from-purple-600 to-rose-600');
+    gs.currentPlayer = getNextPlayerIndex(ctx.victimIdx, 1);
+  } else {
+    if (ctx.hadMatchingColor) {
+      for (let i = 0; i < 4; i++) attacker.hand.push(drawFromDeckInternal());
+      attacker.calledPrism = false;
+      if (victim.id === 0) { userData.stats.challengesWon++; checkAchievements(); }
+      audio.play('challengeWin');
+      showFloatingBanner(`CHALLENGE WON! ${attacker.name} +4!`, 'from-emerald-500 to-teal-500');
+      gs.currentPlayer = ctx.victimIdx;
+    } else {
+      for (let i = 0; i < 6; i++) victim.hand.push(drawFromDeckInternal());
+      victim.calledPrism = false;
+      if (victim.id === 0) { userData.stats.challengesLost++; saveUserData(); }
+      audio.play('challengeLose');
+      showFloatingBanner(`CHALLENGE FAILED! ${victim.name} +6!`, 'from-rose-600 to-red-700');
+      gs.currentPlayer = getNextPlayerIndex(ctx.victimIdx, 1);
+    }
+  }
+
+  renderAll();
+  setTimeout(() => {
+    if (gs.config.opponentType === 'local') showPassDeviceCurtain(gs.currentPlayer);
+    else beginTurn();
+  }, 850);
+}
+
+function humanDrawCard() {
+  const gs = gameState;
+  if (!gs || gs.paused || gs.inputLocked || gs.privacyCurtainActive) return;
+
+  const viewIdx = getViewingHumanIndex();
+  if (gs.currentPlayer !== viewIdx || gs.hasDrawnThisTurn) {
+    audio.play('invalid');
+    return;
+  }
+
+  const player = gs.players[viewIdx];
+  player.calledPrism = false;
+
+  if (gs.config.houseRules.drawUntil) {
+    let drawn = null;
+    let count = 0;
+    do {
+      drawn = drawFromDeckInternal();
+      player.hand.push(drawn);
+      count++;
+    } while (!isCardPlayable(drawn, viewIdx) && count < 15);
+    audio.play('draw');
+    gs.hasDrawnThisTurn = true;
+    if (isCardPlayable(drawn, viewIdx)) {
+      gs.drawnPlayableCardUid = drawn.uid;
+      document.getElementById('post-draw-bar').classList.remove('hidden');
+    } else {
+      endTurnAfterDraw();
+    }
+    renderAll();
+    return;
+  }
+
+  const drawnCard = drawFromDeckInternal();
+  player.hand.push(drawnCard);
+  audio.play('draw');
+  gs.hasDrawnThisTurn = true;
+
+  if (isCardPlayable(drawnCard, viewIdx)) {
+    gs.drawnPlayableCardUid = drawnCard.uid;
+    document.getElementById('post-draw-bar').classList.remove('hidden');
+    renderAll();
+  } else {
+    renderAll();
+    setTimeout(() => endTurnAfterDraw(), 450);
+  }
+}
+
+function playDrawnCard() {
+  const gs = gameState;
+  const viewIdx = getViewingHumanIndex();
+  const player = gs.players[viewIdx];
+  const idx = player.hand.findIndex(c => c.uid === gs.drawnPlayableCardUid);
+  if (idx !== -1) playCardFromHand(viewIdx, idx);
+}
+
+function passAfterDraw() {
+  audio.play('click');
+  document.getElementById('post-draw-bar').classList.add('hidden');
+  endTurnAfterDraw();
+}
+
+function endTurnAfterDraw() {
+  const gs = gameState;
+  gs.currentPlayer = getNextPlayerIndex(gs.currentPlayer, 1);
+  renderAll();
+  if (gs.config.opponentType === 'local') showPassDeviceCurtain(gs.currentPlayer);
+  else beginTurn();
+}
+
+function declarePrism() {
+  const gs = gameState;
+  if (!gs || gs.paused) return;
+  const viewIdx = getViewingHumanIndex();
+  const player = gs.players[viewIdx];
+
+  if (player.hand.length <= 2 && !player.calledPrism) {
+    player.calledPrism = true;
+    audio.play('prism');
+    showFloatingBanner(`${player.name}: PRISM! ✦`, 'from-rose-500 via-amber-400 to-emerald-400');
+    if (viewIdx === 0) { userData.stats.prismCalls++; checkAchievements(); }
+    renderAll();
+  } else {
+    audio.play('invalid');
+  }
+}
+
+function catchUnoCall() {
+  const gs = gameState;
+  if (!gs || gs.paused) return;
+  const viewIdx = getViewingHumanIndex();
+
+  const vulnerableIdx = gs.players.findIndex((p, idx) => idx !== viewIdx && p.hand.length === 1 && !p.calledPrism);
+  if (vulnerableIdx !== -1) {
+    const target = gs.players[vulnerableIdx];
+    target.hand.push(drawFromDeckInternal(), drawFromDeckInternal());
+    target.calledPrism = true;
+    audio.play('catch');
+    showFloatingBanner(`CAUGHT ${target.name}! +2 CARDS!`, 'from-amber-500 to-rose-600');
+    renderAll();
+  }
+}
+
+/* ============================================================================
+   6. AI STRATEGY & DECISIONS
+============================================================================ */
+function executeAITurn() {
+  const gs = gameState;
+  if (!gs || gs.paused) return;
+
+  const aiIdx = gs.currentPlayer;
+  const ai = gs.players[aiIdx];
+  if (ai.isHuman) return;
+
+  const catchChance = gs.config.aiDifficulty === 'hard' ? 0.85 : gs.config.aiDifficulty === 'medium' ? 0.45 : 0.1;
+  gs.players.forEach((p, idx) => {
+    if (idx !== aiIdx && p.hand.length === 1 && !p.calledPrism && Math.random() < catchChance) {
+      p.hand.push(drawFromDeckInternal(), drawFromDeckInternal());
+      p.calledPrism = true;
+      audio.play('catch');
+      showFloatingBanner(`${ai.name} CAUGHT ${p.name}! +2!`, 'from-rose-600 to-amber-500');
+    }
+  });
+
+  const playableIndices = [];
+  ai.hand.forEach((card, idx) => {
+    if (isCardPlayable(card, aiIdx)) playableIndices.push(idx);
+  });
+
+  if (playableIndices.length === 0) {
+    const drawn = drawFromDeckInternal();
+    ai.hand.push(drawn);
+    ai.calledPrism = false;
+    audio.play('draw');
+    renderAll();
+
+    if (isCardPlayable(drawn, aiIdx)) {
+      setTimeout(() => {
+        const newIdx = ai.hand.findIndex(c => c.uid === drawn.uid);
+        const wildColor = chooseAIWildColor(ai);
+        playCardFromHand(aiIdx, newIdx, wildColor);
+      }, 550);
+    } else {
+      setTimeout(() => {
+        gs.currentPlayer = getNextPlayerIndex(aiIdx, 1);
+        beginTurn();
+      }, 450);
+    }
+    return;
+  }
+
+  const chosenIdx = selectAICardIndex(ai, playableIndices);
+  const chosenCard = ai.hand[chosenIdx];
+  const wildColor = (chosenCard.color === 'wild') ? chooseAIWildColor(ai) : null;
+  playCardFromHand(aiIdx, chosenIdx, wildColor);
+}
+
+function selectAICardIndex(ai, playableIndices) {
+  const diff = gameState.config.aiDifficulty;
+  if (diff === 'easy') return playableIndices[Math.floor(Math.random() * playableIndices.length)];
+
+  const nextPlayer = gameState.players[getNextPlayerIndex(gameState.currentPlayer, 1)];
+  const nextLowOnCards = nextPlayer.hand.length <= 2;
+
+  let bestIdx = playableIndices[0];
+  let bestScore = -999;
+
+  for (const idx of playableIndices) {
+    const c = ai.hand[idx];
+    let score = 0;
+    if (c.color === gameState.activeColor) score += 15;
+    if (c.type === 'number') score += c.value;
+    if (c.type === 'skip' || c.type === 'reverse' || c.type === 'draw2') score += nextLowOnCards ? 45 : 18;
+    if (c.type === 'wild') score += ai.hand.length <= 3 ? 25 : -15;
+    if (c.type === 'wild4') {
+      const hasMatchingColor = ai.hand.some(other => other.color === gameState.activeColor);
+      if (diff === 'hard' && hasMatchingColor && !nextLowOnCards) score -= 50;
+      else score += nextLowOnCards ? 50 : -10;
+    }
+    if (score > bestScore) {
+      bestScore = score;
+      bestIdx = idx;
+    }
+  }
+  return bestIdx;
+}
+
+function chooseAIWildColor(ai) {
+  const counts = { red: 0, yellow: 0, green: 0, blue: 0 };
+  ai.hand.forEach(c => { if (counts[c.color] !== undefined) counts[c.color]++; });
+  let best = 'red';
+  for (const col of COLORS) {
+    if (counts[col] > counts[best]) best = col;
+  }
+  return best;
+}
+
+function chooseBestAISwapTarget(aiIdx) {
+  let target = (aiIdx + 1) % gameState.players.length;
+  let minCards = 999;
+  gameState.players.forEach((p, idx) => {
+    if (idx !== aiIdx && p.hand.length < minCards) {
+      minCards = p.hand.length;
+      target = idx;
+    }
+  });
+  return target;
+}
+
+function decideAIWild4Challenge(aiIdx) {
+  const diff = gameState.config.aiDifficulty;
+  const gs = gameState;
+  const attacker = gs.players[gs.lastWild4Context.attackerIdx];
+  if (diff === 'easy') return Math.random() < 0.25;
+  if (diff === 'medium') return Math.random() < 0.45;
+  return attacker.hand.length >= 4 ? Math.random() < 0.65 : Math.random() < 0.3;
+}
+
+/* ============================================================================
+   7. SCORING & ROUND WIN
+============================================================================ */
+function handleRoundWin(winnerIdx) {
+  const gs = gameState;
+  gs.inputLocked = true;
+  const winner = gs.players[winnerIdx];
+
+  let roundPoints = 0;
+  gs.players.forEach((p, idx) => {
+    if (idx !== winnerIdx) {
+      p.hand.forEach(c => { roundPoints += c.points; });
+    }
+  });
+  winner.score += roundPoints;
+
+  const target = gs.config.scoreTarget;
+  const matchOver = target === 0 || winner.score >= target;
+
+  if (gs.config.opponentType === 'ai') {
+    if (matchOver) {
+      userData.stats.gamesPlayed++;
+      if (winnerIdx === 0) {
+        userData.stats.gamesWon++;
+        userData.stats.currentStreak++;
+        if (userData.stats.currentStreak > userData.stats.bestStreak) userData.stats.bestStreak = userData.stats.currentStreak;
+      } else {
+        userData.stats.gamesLost++;
+        userData.stats.currentStreak = 0;
+      }
+    }
+    if (gs.players[0].score > userData.stats.highScore) userData.stats.highScore = gs.players[0].score;
+    checkAchievements();
+  }
+
+  if (winner.isHuman) {
+    audio.play('victory');
+    launchConfetti();
+  } else {
+    audio.play('defeat');
+  }
+
+  document.getElementById('end-winner-avatar').textContent = winner.avatar;
+  document.getElementById('end-subtitle').textContent = matchOver ? 'MATCH COMPLETE!' : `ROUND ${gs.round} WINNER (+${roundPoints} PTS)`;
+  document.getElementById('end-winner-title').textContent = `${winner.name} Wins!`;
+
+  const board = document.getElementById('end-scoreboard');
+  const sorted = [...gs.players].sort((a, b) => b.score - a.score);
+  board.innerHTML = sorted.map(p => `
+    <div class="flex items-center justify-between px-3 py-2 rounded-xl ${p.id === winner.id ? 'bg-amber-500/20 border border-amber-400/40' : 'bg-slate-900/60'}">
+      <div class="flex items-center gap-2">
+        <span>${p.avatar}</span>
+        <span class="font-bold text-white">${p.name}</span>
+        <span class="text-[11px] text-slate-400">(${p.hand.length} left)</span>
+      </div>
+      <div class="font-black text-amber-300">
+        ${p.id === winner.id ? `+${roundPoints} → ` : ''}${p.score} pts
+      </div>
+    </div>
+  `).join('');
+
+  const nextBtn = document.getElementById('btn-next-round');
+  if (matchOver) {
+    nextBtn.textContent = '🔄 Play Again';
+    nextBtn.onclick = () => { closeModal('modal-round-end'); initMatch(gs.config); };
+  } else {
+    nextBtn.textContent = `Next Round (${gs.round + 1}) ➔`;
+    nextBtn.onclick = () => { closeModal('modal-round-end'); gs.round++; startRound(); };
+  }
+
+  openModal('modal-round-end');
+}
+
+/* ============================================================================
+   8. UI RENDERING
+============================================================================ */
+function renderAll() {
+  const gs = gameState;
+  if (!gs) return;
+
+  const viewIdx = getViewingHumanIndex();
+  const isHumanTurn = gs.currentPlayer === viewIdx && !gs.inputLocked;
+  const activePlayer = gs.players[gs.currentPlayer];
+
+  const turnEl = document.getElementById('turn-indicator');
+  if (isHumanTurn) {
+    turnEl.textContent = gs.hasDrawnThisTurn ? '✨ Play Drawn Card or Pass' : `⚡ ${activePlayer.name}'s Turn — Play or Draw`;
+    turnEl.className = 'mb-2 sm:mb-3 px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-500/30 to-emerald-500/30 border border-amber-300/60 text-xs sm:text-sm font-extrabold text-amber-200 shadow-lg';
+  } else {
+    turnEl.textContent = `⏳ ${activePlayer.avatar} ${activePlayer.name} is thinking...`;
+    turnEl.className = 'mb-2 sm:mb-3 px-4 py-1.5 rounded-full glass-panel text-xs sm:text-sm font-bold text-slate-200 shadow-lg';
+  }
+
+  const dirRing = document.getElementById('direction-ring');
+  const dirLbl = document.getElementById('direction-label');
+  if (gs.direction === 1) {
+    dirRing.classList.remove('dir-ccw');
+    dirRing.classList.add('dir-cw');
+    dirLbl.textContent = 'Clockwise ↻';
+  } else {
+    dirRing.classList.remove('dir-cw');
+    dirRing.classList.add('dir-ccw');
+    dirLbl.textContent = 'Counter ↺';
+  }
+
+  document.getElementById('draw-pile-count').textContent = gs.deck.length;
+  document.getElementById('draw-pile-visual').className = `w-20 h-28 sm:w-24 sm:h-36 rounded-2xl card-back card-back-${userData.profile.cardBack} flex flex-col items-center justify-center relative`;
+
+  const humanHasPlayable = gs.players[viewIdx].hand.some(c => isCardPlayable(c, viewIdx));
+  const drawGlow = document.getElementById('draw-pile-glow');
+  if (isHumanTurn && !gs.hasDrawnThisTurn && !humanHasPlayable) drawGlow.classList.remove('hidden');
+  else drawGlow.classList.add('hidden');
+
+  const cMeta = COLOR_META[gs.activeColor];
+  const orb = document.getElementById('active-color-orb');
+  orb.className = `w-12 h-12 sm:w-14 sm:h-14 rounded-2xl border-2 border-white shadow-lg flex flex-col items-center justify-center transition-all duration-300 ${cMeta.orbBg}`;
+  document.getElementById('active-color-icon').textContent = cMeta.icon;
+  document.getElementById('active-color-label').textContent = cMeta.name;
+
+  const stackBadge = document.getElementById('pending-stack-badge');
+  if (gs.pendingDrawCount > 0) {
+    stackBadge.textContent = `+${gs.pendingDrawCount} STACK`;
+    stackBadge.classList.remove('hidden');
+  } else {
+    stackBadge.classList.add('hidden');
+  }
+
+  const topCard = getTopDiscard();
+  document.getElementById('discard-pile-slot').innerHTML = topCard ? renderCardHTML(topCard, 'w-20 h-28 sm:w-24 sm:h-36 pointer-events-none') : '';
+
+  const oppContainer = document.getElementById('opponents-container');
+  oppContainer.innerHTML = gs.players.map((p, idx) => {
+    if (idx === viewIdx) return '';
+    const isTurn = gs.currentPlayer === idx;
+    const isPrismAlert = p.hand.length === 1;
+    const miniBacks = Array.from({ length: Math.min(p.hand.length, 7) })
+      .map(() => `<span class="inline-block w-2.5 h-4 rounded-[3px] card-back card-back-${userData.profile.cardBack} -ml-1 first:ml-0"></span>`)
+      .join('');
+
+    return `
+      <div class="glass-panel px-3 py-2 rounded-2xl flex items-center gap-2.5 transition-all ${isTurn ? 'ring-2 ring-amber-400 bg-indigo-950/75 scale-105' : 'opacity-85'}">
+        <div class="relative text-2xl">
+          ${p.avatar}
+          ${isPrismAlert ? `<span class="absolute -top-2 -right-2 px-1.5 py-0.2 rounded-full text-[9px] font-black ${p.calledPrism ? 'bg-emerald-500 text-slate-950' : 'bg-rose-500 text-white animate-ping'}">${p.calledPrism ? 'PRISM' : '!'}</span>` : ''}
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-xs font-extrabold text-white">${p.name}</span>
+            <span class="text-[10px] font-bold text-amber-300">${p.score}p</span>
+          </div>
+          <div class="flex items-center gap-1.5 mt-0.5">
+            <div class="flex items-center pl-1">${miniBacks}</div>
+            <span class="text-[11px] font-black text-slate-200">${p.hand.length}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  const human = gs.players[viewIdx];
+  document.getElementById('human-avatar-hud').textContent = human.avatar;
+  document.getElementById('human-name-hud').textContent = human.name;
+  document.getElementById('human-score-hud').textContent = `${human.score} pts`;
+  document.getElementById('human-card-count-hud').textContent = `${human.hand.length} card${human.hand.length === 1 ? '' : 's'}${human.calledPrism ? ' • ✦ PRISM CALLED' : ''}`;
+
+  const prismBtn = document.getElementById('btn-declare-prism');
+  if (human.hand.length <= 2 && !human.calledPrism) {
+    prismBtn.classList.remove('opacity-60');
+    prismBtn.classList.add('prism-btn-pulse');
+  } else {
+    prismBtn.classList.add('opacity-60');
+    prismBtn.classList.remove('prism-btn-pulse');
+  }
+
+  const canCatchSomeone = gs.players.some((p, idx) => idx !== viewIdx && p.hand.length === 1 && !p.calledPrism);
+  const catchBtn = document.getElementById('btn-catch-uno');
+  if (canCatchSomeone) catchBtn.classList.remove('hidden');
+  else catchBtn.classList.add('hidden');
+
+  const handContainer = document.getElementById('human-hand-cards');
+  const overlapClass = human.hand.length > 10 ? '-ml-7 sm:-ml-8' : human.hand.length > 7 ? '-ml-5 sm:-ml-6' : '-ml-2 sm:-ml-3';
+
+  handContainer.innerHTML = human.hand.map((card, i) => {
+    const playable = (isHumanTurn && isCardPlayable(card, viewIdx)) || (!isHumanTurn && gs.config.opponentType === 'ai' && canJumpIn(card));
+    const stateCls = playable ? 'playable' : 'unplayable';
+    const marginCls = i === 0 ? '' : overlapClass;
+    return renderCardHTML(card, `hand-card ${stateCls} ${marginCls}`, `data-card-uid="${card.uid}" onclick="handleHumanCardClick(${card.uid})"`);
+  }).join('');
+}
+
+function updateHUDLabels() {
+  const gs = gameState;
+  document.getElementById('hud-mode-badge').textContent = gs.config.modeName;
+  document.getElementById('hud-round-badge').textContent = `Round ${gs.round}`;
+  document.getElementById('hud-target-badge').textContent = gs.config.scoreTarget > 0 ? `Goal: ${gs.config.scoreTarget} pts` : 'Single Round';
+
+  const hrDiv = document.getElementById('hud-house-rules');
+  const activeHR = [];
+  if (gs.config.houseRules.stacking) activeHR.push('Stacking');
+  if (gs.config.houseRules.sevenZero) activeHR.push('7-0 Swap');
+  if (gs.config.houseRules.jumpIn) activeHR.push('Jump-In');
+  if (gs.config.houseRules.drawUntil) activeHR.push('Draw-Until');
+
+  hrDiv.innerHTML = activeHR.map(r => `<span class="px-2 py-0.5 rounded-full bg-indigo-500/25 border border-indigo-400/40 text-[10px] font-bold text-indigo-200">${r}</span>`).join('');
+}
+
+function showFloatingBanner(text, gradientCls = 'from-indigo-500 to-purple-600') {
+  const container = document.getElementById('floating-banner-container');
+  const el = document.createElement('div');
+  el.className = `action-banner fixed left-1/2 top-1/2 px-6 py-3 rounded-2xl bg-gradient-to-r ${gradientCls} text-white font-black text-lg sm:text-2xl tracking-wide shadow-2xl border-2 border-white/80 whitespace-nowrap`;
+  el.textContent = text;
+  container.appendChild(el);
+  setTimeout(() => el.remove(), 1400);
+}
+
+/* ============================================================================
+   9. NAVIGATION & PAUSE
+============================================================================ */
+let afterCurtainCallback = null;
+
+function showPassDeviceCurtain(nextPlayerIdx, callback = null) {
+  const gs = gameState;
+  gs.privacyCurtainActive = true;
+  afterCurtainCallback = callback;
+  const nextP = gs.players[nextPlayerIdx];
+  document.getElementById('pass-next-avatar').textContent = nextP.avatar;
+  document.getElementById('pass-next-name').textContent = nextP.name;
+  openModal('modal-pass-device');
+}
+
+function confirmPassDevice() {
+  audio.play('click');
+  closeModal('modal-pass-device');
+  gameState.privacyCurtainActive = false;
+  renderAll();
+  if (afterCurtainCallback) {
+    const cb = afterCurtainCallback;
+    afterCurtainCallback = null;
+    cb();
+  } else {
+    beginTurn();
+  }
+}
+
+function pauseGame() {
+  if (!gameState) return;
+  audio.play('click');
+  gameState.paused = true;
+  clearTimeout(aiTimeout);
+  openModal('modal-pause');
+}
+
+function resumeGame() {
+  if (!gameState) return;
+  audio.play('click');
+  closeModal('modal-pause');
+  gameState.paused = false;
+  const curr = gameState.players[gameState.currentPlayer];
+  if (!curr.isHuman) aiTimeout = setTimeout(() => executeAITurn(), 500);
+}
+
+function restartCurrentMatch() {
+  audio.play('start');
+  closeModal('modal-pause');
+  if (gameState) initMatch(gameState.config);
+}
+
+function returnToMenu() {
+  audio.play('click');
+  clearTimeout(aiTimeout);
+  stopConfetti();
+  document.querySelectorAll('[id^="modal-"]').forEach(m => {
+    m.classList.add('hidden');
+    m.classList.remove('flex');
+  });
+  gameState = null;
+  showScreen('screen-menu');
+}
+
+function showScreen(id) {
+  document.getElementById('screen-menu').classList.add('hidden');
+  document.getElementById('screen-game').classList.add('hidden');
+  document.getElementById('screen-game').classList.remove('flex');
+
+  const target = document.getElementById(id);
+  target.classList.remove('hidden');
+  if (id === 'screen-game') target.classList.add('flex');
+}
+
+function openModal(id) {
+  audio.play('click');
+  if (id === 'modal-profile') populateProfileModal();
+  const el = document.getElementById(id);
+  el.classList.remove('hidden');
+  el.classList.add('flex');
+}
+
+function closeModal(id) {
+  const el = document.getElementById(id);
+  el.classList.add('hidden');
+  el.classList.remove('flex');
+}
+
+/* ============================================================================
+   10. SETTINGS & PROFILE HANDLERS
+============================================================================ */
+function toggleMute() {
+  userData.settings.muted = !userData.settings.muted;
+  saveUserData();
+  applySavedPreferences();
+  if (!userData.settings.muted) audio.play('click');
+}
+
+function updateAudioSettings() {
+  userData.settings.sfxEnabled = document.getElementById('set-sfx-enabled').checked;
+  userData.settings.musicEnabled = document.getElementById('set-music-enabled').checked;
+  userData.settings.sfxVol = parseInt(document.getElementById('set-sfx-vol').value, 10);
+  userData.settings.musicVol = parseInt(document.getElementById('set-music-vol').value, 10);
+  saveUserData();
+  applySavedPreferences();
+}
+
+function updateDisplaySettings() {
+  userData.settings.reduceAnim = document.getElementById('set-reduce-anim').checked;
+  saveUserData();
+  applySavedPreferences();
+}
+
+function confirmResetData() {
+  const btn = document.getElementById('btn-reset-stats');
+  if (!resetConfirmArmed) {
+    resetConfirmArmed = true;
+    btn.textContent = 'Tap Again to Confirm';
+    setTimeout(() => { resetConfirmArmed = false; btn.textContent = 'Reset Stats'; }, 3500);
+    return;
+  }
+  resetConfirmArmed = false;
+  btn.textContent = 'Reset Stats';
+  userData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+  saveUserData();
+  applySavedPreferences();
+  audio.play('shuffle');
+}
+
+let tempAvatar = userData.profile.avatar;
+let tempCardBack = userData.profile.cardBack;
+let tempBgTheme = userData.profile.bgTheme;
+
+function populateProfileModal() {
+  document.getElementById('prof-name-input').value = userData.profile.name;
+  tempAvatar = userData.profile.avatar;
+  tempCardBack = userData.profile.cardBack;
+  tempBgTheme = userData.profile.bgTheme;
+
+  document.getElementById('prof-avatar-grid').innerHTML = AVATARS.map(av => `
+    <button type="button" onclick="selectAvatar('${av}')" class="av-opt p-2 rounded-xl text-2xl border ${av === tempAvatar ? 'border-amber-400 bg-indigo-600/40' : 'border-white/10 bg-slate-900'}">
+      ${av}
+    </button>
+  `).join('');
+  highlightProfilePills();
+}
+
+function selectAvatar(av) {
+  audio.play('click');
+  tempAvatar = av;
+  populateProfileModal();
+}
+
+function selectCardBack(cb) {
+  audio.play('click');
+  tempCardBack = cb;
+  highlightProfilePills();
+}
+
+function selectBgTheme(bg) {
+  audio.play('click');
+  tempBgTheme = bg;
+  highlightProfilePills();
+}
+
+function highlightProfilePills() {
+  document.querySelectorAll('.cb-opt').forEach(b => {
+    b.classList.toggle('border-amber-400', b.dataset.cb === tempCardBack);
+    b.classList.toggle('bg-indigo-600/40', b.dataset.cb === tempCardBack);
+  });
+  document.querySelectorAll('.bg-opt').forEach(b => {
+    b.classList.toggle('border-amber-400', b.dataset.bg === tempBgTheme);
+    b.classList.toggle('bg-indigo-600/40', b.dataset.bg === tempBgTheme);
+  });
+}
+
+function saveProfile() {
+  const rawName = document.getElementById('prof-name-input').value.trim();
+  userData.profile.name = rawName || 'Nova';
+  userData.profile.avatar = tempAvatar;
+  userData.profile.cardBack = tempCardBack;
+  userData.profile.bgTheme = tempBgTheme;
+  saveUserData();
+  applySavedPreferences();
+  closeModal('modal-profile');
+  audio.play('wild');
+}
+
+function openStatsModal() {
+  checkAchievements();
+  const s = userData.stats;
+  const winRate = s.gamesPlayed > 0 ? Math.round((s.gamesWon / s.gamesPlayed) * 100) : 0;
+
+  const statItems = [
+    { label: 'Played', val: s.gamesPlayed },
+    { label: 'Won', val: s.gamesWon },
+    { label: 'Win Rate', val: `${winRate}%` },
+    { label: 'High Score', val: s.highScore },
+    { label: 'Best Streak', val: s.bestStreak },
+    { label: 'Cards Played', val: s.cardsPlayed },
+    { label: 'PRISM! Calls', val: s.prismCalls },
+    { label: 'Challenges Won', val: s.challengesWon },
+    { label: 'Challenges Lost', val: s.challengesLost }
+  ];
+
+  document.getElementById('stats-grid').innerHTML = statItems.map(item => `
+    <div class="bg-slate-900/80 border border-white/10 rounded-2xl p-2.5 text-center">
+      <div class="text-lg sm:text-xl font-black text-white">${item.val}</div>
+      <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">${item.label}</div>
+    </div>
+  `).join('');
+
+  document.getElementById('achievements-list').innerHTML = ACHIEVEMENT_DEFS.map(ach => {
+    const unlocked = userData.achievements[ach.id];
+    return `
+      <div class="flex items-center gap-3 p-3 rounded-2xl border ${unlocked ? 'bg-amber-500/15 border-amber-400/50' : 'bg-slate-900/60 border-white/10 opacity-55'}">
+        <span class="text-2xl">${unlocked ? ach.icon : '🔒'}</span>
+        <div class="flex-1">
+          <div class="text-xs sm:text-sm font-extrabold text-white">${ach.title}</div>
+          <div class="text-[11px] text-slate-300">${ach.desc}</div>
+        </div>
+        <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${unlocked ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-400'}">
+          ${unlocked ? 'Unlocked' : 'Locked'}
+        </span>
+      </div>
+    `;
+  }).join('');
+
+  openModal('modal-stats');
+}
+
+/* ============================================================================
+   11. KEYBOARD & CONFETTI
+============================================================================ */
+document.addEventListener('keydown', (e) => {
+  if (!gameState || gameState.paused || gameState.privacyCurtainActive) return;
+  const key = e.key.toLowerCase();
+  if (key === 'd') humanDrawCard();
+  else if (key === 'u' || key === 'p') declarePrism();
+  else if (key >= '1' && key <= '9') {
+    const idx = parseInt(key, 10) - 1;
+    const viewIdx = getViewingHumanIndex();
+    const hand = gameState.players[viewIdx].hand;
+    if (hand[idx]) handleHumanCardClick(hand[idx].uid);
+  }
+});
+
+let confettiAnimId = null;
+function launchConfetti() {
+  if (userData.settings.reduceAnim) return;
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const colors = ['#ff3b5c', '#fbbf24', '#10b981', '#3b82f6', '#a855f7'];
+  const pieces = Array.from({ length: 90 }, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height - canvas.height,
+    w: 7 + Math.random() * 6,
+    h: 10 + Math.random() * 8,
+    color: colors[Math.floor(Math.random() * colors.length)],
+    vy: 2.5 + Math.random() * 3.5,
+    vx: -1.5 + Math.random() * 3,
+    rot: Math.random() * Math.PI * 2,
+    vrot: -0.1 + Math.random() * 0.2
+  }));
+
+  function step() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    pieces.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rot += p.vrot;
+      if (p.y > canvas.height) p.y = -20;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    });
+    confettiAnimId = requestAnimationFrame(step);
+  }
+  stopConfetti();
+  step();
+}
+
+function stopConfetti() {
+  if (confettiAnimId) {
+    cancelAnimationFrame(confettiAnimId);
+    confettiAnimId = null;
+  }
+  const canvas = document.getElementById('confetti-canvas');
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+}
+
+window.addEventListener('resize', () => {
+  const canvas = document.getElementById('confetti-canvas');
+  if (canvas) {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+});
+
+/* ============================================================================
+   12. GITHUB PAGES PWA ENGINE, SW REGISTRATION & INSTALLATION HANDLERS
+============================================================================ */
+let deferredInstallPrompt = null;
+let pwaStatusInfo = {
+  isStandalone: false,
+  isSecureContextLike: false,
+  swRegistered: false,
+  swMessage: 'Pending window load'
+};
+let activePwaTab = 'manifest';
+
+function buildStandardManifestObject() {
+  return {
+    id: './',
+    name: 'PRISM CLASH',
+    short_name: 'Prism Clash',
+    description: 'Cosmic Tactical Card Arena',
+    start_url: './',
+    scope: './',
+    display: 'standalone',
+    orientation: 'portrait',
+    background_color: '#070913',
+    theme_color: '#0b0e1c',
+    categories: ['games', 'card'],
+    icons: [
+      {
+        src: './icons/icon-192.png',
+        sizes: '192x192',
+        type: 'image/png',
+        purpose: 'any'
+      },
+      {
+        src: './icons/icon-512.png',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'any'
+      },
+      {
+        src: './icons/icon-512.png',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'maskable'
+      }
+    ]
+  };
+}
+
+function getStandaloneServiceWorkerSource() {
+  return `const CACHE_NAME = "prism-clash-v1";
+
+const ASSETS = [
+  "./",
+  "./index.html",
+  "./manifest.json",
+  "./sw.js",
+  "./icons/icon-192.png",
+  "./icons/icon-512.png"
+];
+
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)).catch(() => {})
+  );
+  self.skipWaiting();
+});
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(
+        keys
+          .filter((key) => key !== CACHE_NAME)
+          .map((key) => caches.delete(key))
+      )
+    )
+  );
+  self.clients.claim();
+});
+
+self.addEventListener("fetch", (event) => {
+  if (event.request.method !== "GET") return;
+
+  event.respondWith(
+    fetch(event.request)
+      .then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
+          const clone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone)).catch(() => {});
+        }
+        return networkResponse;
+      })
+      .catch(() => caches.match(event.request).then((cached) => cached || caches.match("./index.html")))
+  );
+});`;
+}
+
+function getDeployAndApkGuideText() {
+  return `# Deploying PRISM CLASH on GitHub Pages
+
+1. Folder Layout in your GitHub Repository:
+   prism-clash/ (or root of repository)
+   ├── index.html
+   ├── manifest.json
+   ├── sw.js
+   └── icons/
+       ├── icon-192.png
+       └── icon-512.png
+
+2. Configure GitHub Pages:
+   - Go to your repository on GitHub.
+   - Click Settings -> Pages.
+   - Under 'Build and deployment', choose 'Deploy from a branch'.
+   - Select 'main' (or 'master') branch and '/' root folder, then click Save.
+   - Your PWA will be published at https://<username>.github.io/<repo-name>/
+
+3. Install in Chrome on Phone:
+   - Open https://<username>.github.io/<repo-name>/ in Mobile Chrome.
+   - Tap the 'Install App' button or Chrome menu (⋮) -> 'Install app' / 'Add to Home screen'.`;
+}
+
+function renderPrismAppIconCanvas(size, maskable = false) {
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return null;
+
+  const pad = maskable ? size * 0.14 : size * 0.05;
+  const radius = size * (maskable ? 0.22 : 0.24);
+  const w = size - pad * 2;
+  const h = size - pad * 2;
+
+  ctx.fillStyle = '#070913';
+  ctx.fillRect(0, 0, size, size);
+
+  const bgGrad = ctx.createLinearGradient(0, 0, size, size);
+  bgGrad.addColorStop(0, '#1e1b4b');
+  bgGrad.addColorStop(0.5, '#0f172a');
+  bgGrad.addColorStop(1, '#070913');
+  ctx.fillStyle = bgGrad;
+  ctx.beginPath();
+  ctx.roundRect(pad, pad, w, h, radius);
+  ctx.fill();
+
+  const prismGrad = ctx.createLinearGradient(pad, pad, size - pad, size - pad);
+  prismGrad.addColorStop(0, '#ff3b5c');
+  prismGrad.addColorStop(0.35, '#fbbf24');
+  prismGrad.addColorStop(0.7, '#10b981');
+  prismGrad.addColorStop(1, '#3b82f6');
+
+  ctx.lineWidth = Math.max(4, size * 0.025);
+  ctx.strokeStyle = prismGrad;
+  ctx.beginPath();
+  ctx.roundRect(pad + ctx.lineWidth * 0.5, pad + ctx.lineWidth * 0.5, w - ctx.lineWidth, h - ctx.lineWidth, radius);
+  ctx.stroke();
+
+  const cx = size / 2;
+  const cy = size / 2;
+  const r = w * 0.31;
+
+  ctx.fillStyle = prismGrad;
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - r);
+  ctx.lineTo(cx + r, cy);
+  ctx.lineTo(cx, cy + r);
+  ctx.lineTo(cx - r, cy);
+  ctx.closePath();
+  ctx.fill();
+
+  const starR = r * 0.44;
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  for (let i = 0; i < 8; i++) {
+    const rad = i % 2 === 0 ? starR : starR * 0.36;
+    const angle = (i * Math.PI) / 4 - Math.PI / 2;
+    const sx = cx + Math.cos(angle) * rad;
+    const sy = cy + Math.sin(angle) * rad;
+    if (i === 0) ctx.moveTo(sx, sy);
+    else ctx.lineTo(sx, sy);
+  }
+  ctx.closePath();
+  ctx.fill();
+
+  return canvas;
+}
+
+function downloadTextAsset(filename, content, mimeType) {
+  try {
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
+function downloadPngIconAsset(size, filename, maskable) {
+  audio.play('click');
+  const canvas = renderPrismAppIconCanvas(size, maskable);
+  const feedback = document.getElementById('pwa-copy-feedback');
+  if (!canvas || typeof canvas.toBlob !== 'function') {
+    if (feedback) feedback.textContent = `Could not generate ${filename} in this browser.`;
+    return;
+  }
+  canvas.toBlob((blob) => {
+    if (!blob) return;
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+    if (feedback) feedback.textContent = `Downloaded ${filename} (${size}x${size}) — place inside ./icons/.`;
+  }, 'image/png');
+}
+
+function downloadPwaFileByName(kind) {
+  audio.play('click');
+  const feedback = document.getElementById('pwa-copy-feedback');
+  if (kind === 'manifest') {
+    const ok = downloadTextAsset('manifest.json', JSON.stringify(buildStandardManifestObject(), null, 2), 'application/manifest+json');
+    if (feedback) feedback.textContent = ok ? 'Downloaded manifest.json — place in repository root.' : 'Copy manifest.json from preview box.';
+  } else if (kind === 'sw') {
+    const ok = downloadTextAsset('sw.js', getStandaloneServiceWorkerSource(), 'application/javascript');
+    if (feedback) feedback.textContent = ok ? 'Downloaded sw.js — place in repository root.' : 'Copy sw.js from preview box.';
+  }
+}
+
+function downloadAllPwaFiles() {
+  audio.play('start');
+  downloadTextAsset('manifest.json', JSON.stringify(buildStandardManifestObject(), null, 2), 'application/manifest+json');
+  setTimeout(() => { downloadTextAsset('sw.js', getStandaloneServiceWorkerSource(), 'application/javascript'); }, 180);
+  setTimeout(() => { downloadPngIconAsset(192, 'icon-192.png', false); }, 360);
+  setTimeout(() => {
+    downloadPngIconAsset(512, 'icon-512.png', true);
+    const feedback = document.getElementById('pwa-copy-feedback');
+    if (feedback) feedback.textContent = 'Downloaded manifest.json, sw.js, icon-192.png, and icon-512.png.';
+  }, 540);
+}
+
+function downloadActivePwaFile() {
+  audio.play('click');
+  const feedback = document.getElementById('pwa-copy-feedback');
+  if (activePwaTab === 'deploy') {
+    const ok = downloadTextAsset('GITHUB-PWA-GUIDE.txt', getDeployAndApkGuideText(), 'text/plain');
+    if (feedback) feedback.textContent = ok ? 'Downloaded GITHUB-PWA-GUIDE.txt.' : 'Copy guide above.';
+    return;
+  }
+  const isManifest = activePwaTab === 'manifest';
+  const filename = isManifest ? 'manifest.json' : 'sw.js';
+  const content = isManifest ? JSON.stringify(buildStandardManifestObject(), null, 2) : getStandaloneServiceWorkerSource();
+  const mime = isManifest ? 'application/manifest+json' : 'application/javascript';
+  const ok = downloadTextAsset(filename, content, mime);
+  if (feedback) feedback.textContent = ok ? `Downloaded ${filename}.` : `Copy ${filename} above.`;
+}
+
+function detectCurrentOriginCategory() {
+  const proto = window.location.protocol;
+  const host = (window.location.hostname || '').toLowerCase();
+  const fullHref = window.location.href.toLowerCase();
+
+  if (proto === 'file:') {
+    return {
+      type: 'Local File (file://)',
+      badge: '⚠️ Local File Origin (file://)',
+      boxCls: 'bg-amber-500/15 border-amber-400/45 text-amber-100',
+      badgeCls: 'text-amber-300',
+      explanation: 'file:// protocol blocks Service Worker registration and Chrome PWA installation. Upload your files to GitHub Pages over HTTPS.'
+    };
+  }
+
+  if (host.includes('github.io')) {
+    return {
+      type: 'GitHub Pages Origin',
+      badge: '✅ GitHub Pages Live Origin Detected',
+      boxCls: 'bg-emerald-500/15 border-emerald-400/45 text-emerald-100',
+      badgeCls: 'text-emerald-300',
+      explanation: 'Your game is hosted on GitHub Pages over HTTPS with relative path support. Service Worker and Chrome PWA install are fully enabled.'
+    };
+  }
+
+  if (host === 'localhost' || host === '127.0.0.1' || host === '[::1]') {
+    return {
+      type: 'Localhost Development Origin',
+      badge: '🧪 Localhost Origin Ready',
+      boxCls: 'bg-sky-500/15 border-sky-400/45 text-sky-100',
+      badgeCls: 'text-sky-300',
+      explanation: 'Localhost allows testing PWA Service Worker behavior. Push to GitHub Pages for production access on mobile.'
+    };
+  }
+
+  if (proto === 'https:') {
+    return {
+      type: 'HTTPS Web Origin',
+      badge: '✅ HTTPS Origin Detected',
+      boxCls: 'bg-emerald-500/15 border-emerald-400/45 text-emerald-100',
+      badgeCls: 'text-emerald-300',
+      explanation: 'Served over HTTPS on an independent origin. Ensure manifest.json, sw.js, and icons/ are in place.'
+    };
+  }
+
+  return {
+    type: `${proto} Origin`,
+    badge: '🌐 Web Origin',
+    boxCls: 'bg-slate-800/80 border-white/15 text-slate-200',
+    badgeCls: 'text-indigo-300',
+    explanation: 'Deploy the repository files to GitHub Pages for full PWA installation support.'
+  };
+}
+
+function refreshPwaEnvironmentState() {
+  const proto = window.location.protocol;
+  const isHttp = proto === 'http:' || proto === 'https:';
+  pwaStatusInfo.isSecureContextLike = isHttp || window.isSecureContext;
+  pwaStatusInfo.isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+  if (!isHttp) {
+    pwaStatusInfo.swRegistered = false;
+    pwaStatusInfo.swMessage = `Unavailable on ${proto}`;
+  } else if (!('serviceWorker' in navigator)) {
+    pwaStatusInfo.swRegistered = false;
+    pwaStatusInfo.swMessage = 'Service Worker unsupported in this browser';
+  }
+  updatePwaUI();
+}
+
+function updatePwaUI() {
+  const installHeaderBtn = document.getElementById('btn-install-app');
+  const installModalBtn = document.getElementById('btn-modal-install-now');
+  const statusIcon = document.getElementById('pwa-status-icon');
+  const statusTitle = document.getElementById('pwa-status-title');
+  const statusSub = document.getElementById('pwa-status-sub');
+
+  const originInfo = detectCurrentOriginCategory();
+  const canPromptInstall = Boolean(deferredInstallPrompt) && !pwaStatusInfo.isStandalone;
+
+  if (installHeaderBtn) installHeaderBtn.classList.toggle('hidden', !canPromptInstall);
+  if (installModalBtn) installModalBtn.classList.toggle('hidden', !canPromptInstall);
+
+  if (pwaStatusInfo.isStandalone) {
+    if (statusIcon) statusIcon.textContent = '✅';
+    if (statusTitle) statusTitle.textContent = 'Installed PWA App';
+    if (statusSub) statusSub.textContent = 'Running standalone • Offline ready';
+  } else if (canPromptInstall) {
+    if (statusIcon) statusIcon.textContent = '📲';
+    if (statusTitle) statusTitle.textContent = 'Ready to Install in Chrome';
+    if (statusSub) statusSub.textContent = 'Tap Install App to add PRISM CLASH';
+  } else if (pwaStatusInfo.swRegistered) {
+    if (statusIcon) statusIcon.textContent = '🛡️';
+    if (statusTitle) statusTitle.textContent = 'Service Worker Registered (./sw.js)';
+    if (statusSub) statusSub.textContent = 'Relative paths configured for GitHub Pages';
+  } else {
+    if (statusIcon) statusIcon.textContent = '🌐';
+    if (statusTitle) statusTitle.textContent = originInfo.type;
+    if (statusSub) statusSub.textContent = 'Tap PWA Studio for GitHub Pages files';
+  }
+
+  const calloutEl = document.getElementById('pwa-origin-callout');
+  const badgeEl = document.getElementById('pwa-origin-badge');
+  const explEl = document.getElementById('pwa-origin-explanation');
+  if (calloutEl) calloutEl.className = `p-3.5 rounded-2xl border mb-4 text-xs leading-relaxed ${originInfo.boxCls}`;
+  if (badgeEl) {
+    badgeEl.textContent = originInfo.badge;
+    badgeEl.className = `font-black uppercase tracking-wider mb-1 ${originInfo.badgeCls}`;
+  }
+  if (explEl) explEl.textContent = originInfo.explanation;
+
+  const diagProto = document.getElementById('pwa-diag-protocol');
+  const diagOriginType = document.getElementById('pwa-diag-origin-type');
+  const diagDisplay = document.getElementById('pwa-diag-display');
+  const diagSw = document.getElementById('pwa-diag-sw');
+
+  if (diagProto) diagProto.textContent = `${window.location.protocol}//${window.location.host}${window.location.pathname}`;
+  if (diagOriginType) diagOriginType.textContent = originInfo.type;
+  if (diagDisplay) diagDisplay.textContent = pwaStatusInfo.isStandalone ? 'standalone (Installed)' : 'browser tab';
+  if (diagSw) {
+    diagSw.textContent = pwaStatusInfo.swMessage;
+    diagSw.className = `font-bold mt-0.5 ${pwaStatusInfo.swRegistered ? 'text-emerald-300' : 'text-amber-300'}`;
+  }
+}
+
+async function triggerPwaInstall() {
+  audio.play('click');
+  if (!deferredInstallPrompt) {
+    openPwaInfoModal();
+    return;
+  }
+  const promptEvent = deferredInstallPrompt;
+  deferredInstallPrompt = null;
+  updatePwaUI();
+  try {
+    promptEvent.prompt();
+    await promptEvent.userChoice;
+  } catch (err) {}
+  updatePwaUI();
+}
+
+function openPwaInfoModal() {
+  refreshPwaEnvironmentState();
+  switchPwaCodeTab(activePwaTab);
+  openModal('modal-pwa');
+}
+
+function switchPwaCodeTab(tab) {
+  audio.play('click');
+  activePwaTab = tab;
+  const tabManifest = document.getElementById('tab-pwa-manifest');
+  const tabSw = document.getElementById('tab-pwa-sw');
+  const tabDeploy = document.getElementById('tab-pwa-deploy');
+  const textarea = document.getElementById('pwa-code-preview');
+  const feedback = document.getElementById('pwa-copy-feedback');
+
+  if (feedback) feedback.textContent = '';
+
+  const inactiveCls = 'px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 font-bold text-xs';
+  const activeCls = 'px-3 py-1.5 rounded-xl bg-indigo-600 text-white font-bold text-xs';
+
+  if (tabManifest) tabManifest.className = tab === 'manifest' ? activeCls : inactiveCls;
+  if (tabSw) tabSw.className = tab === 'sw' ? activeCls : inactiveCls;
+  if (tabDeploy) tabDeploy.className = tab === 'deploy' ? activeCls : inactiveCls;
+
+  if (!textarea) return;
+  if (tab === 'manifest') textarea.value = JSON.stringify(buildStandardManifestObject(), null, 2);
+  else if (tab === 'sw') textarea.value = getStandaloneServiceWorkerSource();
+  else textarea.value = getDeployAndApkGuideText();
+}
+
+function copyActivePwaSnippet() {
+  const textarea = document.getElementById('pwa-code-preview');
+  const feedback = document.getElementById('pwa-copy-feedback');
+  if (!textarea) return;
+
+  textarea.focus();
+  textarea.select();
+  let copied = false;
+  try {
+    copied = document.execCommand('copy');
+  } catch (e) {
+    copied = false;
+  }
+
+  audio.play('click');
+  const label = activePwaTab === 'manifest' ? 'manifest.json' : activePwaTab === 'sw' ? 'sw.js' : 'GitHub guide';
+  if (feedback) feedback.textContent = copied ? `Copied ${label} to clipboard!` : 'Select and copy above manually.';
+}
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', async () => {
+    refreshPwaEnvironmentState();
+    const proto = window.location.protocol;
+    if (proto !== 'http:' && proto !== 'https:') return;
+
+    try {
+      await navigator.serviceWorker.register('./sw.js', { scope: './' });
+      pwaStatusInfo.swRegistered = true;
+      pwaStatusInfo.swMessage = 'Registered (./sw.js)';
+      console.log('PRISM CLASH: Service Worker Registered for GitHub Pages');
+    } catch (error) {
+      pwaStatusInfo.swRegistered = false;
+      pwaStatusInfo.swMessage = './sw.js registration blocked or missing';
+      console.warn('PRISM CLASH Service Worker Notice:', error);
+    }
+    updatePwaUI();
+  });
+}
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  updatePwaUI();
+});
+
+window.addEventListener('appinstalled', () => {
+  deferredInstallPrompt = null;
+  pwaStatusInfo.isStandalone = true;
+  audio.play('victory');
+  showFloatingBanner('PRISM CLASH INSTALLED! 📲', 'from-emerald-500 to-teal-500');
+  updatePwaUI();
+});
+
+window.matchMedia('(display-mode: standalone)').addEventListener('change', (e) => {
+  pwaStatusInfo.isStandalone = e.matches;
+  updatePwaUI();
+});
+
+// Boot initialization
+applySavedPreferences();
+refreshPwaEnvironmentState();
+</script>
+</body>
+</html>
